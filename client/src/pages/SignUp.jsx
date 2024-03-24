@@ -27,19 +27,19 @@ export default function SignUp() {
   };
 
   return (
-    <div className="bg-[#f0f2f5] flex justify-center items-center h-screen w-screen">
+    <div className="bg-[#f0f2f5] flex justify-center items-center min-h-screen">
       {/*loginWrapper */}
-      <div className="flex w-7/10 h-7/10 items-center">
+      <div className="flex flex-col justify-center sm:flex-row overflow-y: auto w-7/10 h-7/10 items-center">
         {/* loginLeft div and loginRight div using flex-1, cuz flex-row is default, so the two div distributed in x axis */}
         {/*loginLeft */}
-        <div className="flex-1 flex-col justify-center">
-          <h3 className="text-[#007FFF] text-5xl font-bold mb-2">Fakebook</h3>
-          <span className="text-normal">
-            Connect with the world around you on Fakebook
+        <div className="flex-1 flex-col justify-center items-center ">
+          <h3 className="text-[#007FFF] text-5xl font-bold mb-3">fakebook</h3>
+          <span className="font-semibold text-lg">
+            Connect with friends and the world around you on Fakebook
           </span>
         </div>
         {/*loginRight*/}
-        <div className="flex-1 flex-col justify-center">
+        <div className="flex-1 flex-col justify-center m-5">
           <form
             onSubmit={handleSubmit}
             className="bg-white flex flex-col justify-between h-[400px] p-5 rounded-lg">
@@ -72,11 +72,14 @@ export default function SignUp() {
               Sign Up
             </button>
             <hr className="border-1" />
-            <Link to={"/sign-up"}>
-              <span className="text-white bg-[#03C03C] font-semibold mx-auto rounded-lg cursor-pointer p-2">
-                Create New Account
-              </span>
-            </Link>
+            <div className="flex flex-row items-center justify-center gap-2">
+              <p>Already have an Account?</p>
+              <Link
+                to={"/sign-up"}
+                className="text-[#007FFF] font-semibold rounded-lg cursor-pointer">
+                <span> Login </span>
+              </Link>
+            </div>
           </form>
         </div>
       </div>
