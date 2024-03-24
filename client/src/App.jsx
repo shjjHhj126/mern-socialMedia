@@ -1,8 +1,12 @@
-import Home from "./pages/home/Home";
-import LogIn from "./pages/login/LogIn";
-import Profile from "./pages/profile/Profile";
-import SignUp from "./pages/signup/signUp";
+import Home from "./pages/Home";
+import LogIn from "./pages/LogIn";
+import Profile from "./pages/Profile";
+import SignUp from "./pages/SignUp";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import axios from "axios";
+
+axios.defaults.baseURL = "http://localhost:3000";
+axios.defaults.withCredentials = true;
 
 export default function App() {
   return (
