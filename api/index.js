@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
 const userRoute = require("./routes/user.route");
 const authRoute = require("./routes/auth.route");
 const postRoute = require("./routes/post.route");
@@ -18,12 +18,13 @@ mongoose
   });
 
 const app = express();
-const router = express.Router();
 
 // middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // routes
+const testRouter = express.Router();
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
