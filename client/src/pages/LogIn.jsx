@@ -10,7 +10,7 @@ import {
 
 export default function LogIn() {
   const [formData, setFormData] = useState({});
-  const { error } = useSelector((state) => state.user);
+  const { error, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -32,10 +32,9 @@ export default function LogIn() {
       });
       const res = res1.data.data;
       if (res.success === false) {
-        console.log("User not found");
         dispatch(logInFailure(res.message));
       }
-      console.log(res);
+      // console.log(res);
       dispatch(logInSuccess(res));
       navigate("/");
     } catch (err) {
@@ -77,8 +76,10 @@ export default function LogIn() {
               minLength="6"
               required
             />
-            <button className="text-white bg-[#007FFF] font-semibold border-none h-[50px] rounded-lg p-2">
-              Log In
+            <button
+              disabled={loading}
+              className="text-white bg-[#007FFF] font-semibold border-none h-[50px] rounded-lg p-2 hover:opacity-95 disabled:opacity-80">
+              {loading ? "Loading..." : "Log In"}
             </button>
             {error && <p className=" text-red-500 ">{error}</p>}
             <hr className="border-1" />
