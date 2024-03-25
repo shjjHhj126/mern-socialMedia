@@ -1,9 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  logInFailure,
+  logInStart,
+  logInSuccess,
+} from "../redux/user/userSlice";
 
 export default function LogIn() {
   const [formData, setFormData] = useState({});
+  const { error } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -11,18 +20,26 @@ export default function LogIn() {
       [e.target.id]: e.target.value,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(logInStart());
       const res1 = await axios.post("/api/auth/login", formData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-      const res = res1.data;
+      const res = res1.data.data;
+      if (res.success === false) {
+        console.log("User not found");
+        dispatch(logInFailure(res.message));
+      }
       console.log(res);
+      dispatch(logInSuccess(res));
+      navigate("/");
     } catch (err) {
-      console.log(err);
+      dispatch(logInFailure(err.response.data.message));
     }
   };
 
@@ -63,11 +80,12 @@ export default function LogIn() {
             <button className="text-white bg-[#007FFF] font-semibold border-none h-[50px] rounded-lg p-2">
               Log In
             </button>
+            {error && <p className=" text-red-500 ">{error}</p>}
             <hr className="border-1" />
             <div className="flex flex-row items-center justify-center gap-2">
               <p>Do not have an account?</p>
               <Link
-                to={"/sign-up"}
+                to={"/sign-in"}
                 className="text-[#007FFF] font-semibold rounded-lg cursor-pointer">
                 <span> Signup </span>
               </Link>
