@@ -30,13 +30,24 @@ app.use(
   })
 );
 
+// listen to a port
+app.listen(3000, () => {
+  console.log("server is running!");
+});
+
 // routes
 const testRouter = express.Router();
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
 
-// listen to a port
-app.listen(3000, () => {
-  console.log("server is running!");
+//error handling middleware
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  return res.status(statusCode).json({
+    success: false,
+    message: message,
+    statusCode,
+  });
 });

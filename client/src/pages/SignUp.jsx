@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -75,7 +75,7 @@ export default function SignUp() {
             <div className="flex flex-row items-center justify-center gap-2">
               <p>Already have an Account?</p>
               <Link
-                to={"/sign-up"}
+                to={"/log-in"}
                 className="text-[#007FFF] font-semibold rounded-lg cursor-pointer">
                 <span> Login </span>
               </Link>

@@ -17,4 +17,14 @@ const signup = async (req, res, next) => {
     next(err);
   }
 };
-module.exports = { signup };
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+  } catch (err) {
+    //check if the email exists
+    const ValidUser = await userModel.findOne({ email });
+
+    if (!ValidUser) return next();
+  }
+};
+module.exports = { signup, login };
