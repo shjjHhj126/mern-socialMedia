@@ -14,7 +14,7 @@ export default function LogIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res1 = await axios.post("/api/auth/signup", formData, {
+      const res1 = await axios.post("/api/auth/login", formData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -42,7 +42,7 @@ export default function LogIn() {
         <div className="flex-1 flex-col justify-center m-5">
           <form
             onSubmit={handleSubmit}
-            className="bg-white flex flex-col justify-between h-[400px] p-5 rounded-lg">
+            className="bg-white flex flex-col  h-[400px] p-5 rounded-lg gap-7">
             <input
               type="text"
               id="email"

@@ -72,7 +72,7 @@ export default function SignUp() {
               Sign Up
             </button>
             <hr className="border-1" />
-            <div className="flex flex-row items-center justify-center gap-2">
+            <div className="flex flex-row items-center justify-center gap-5">
               <p>Already have an Account?</p>
               <Link
                 to={"/log-in"}
