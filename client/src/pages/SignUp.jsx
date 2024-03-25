@@ -29,7 +29,7 @@ export default function SignUp() {
   return (
     <div className="bg-[#f0f2f5] flex justify-center items-center min-h-screen">
       {/*loginWrapper */}
-      <div className="flex flex-col justify-center sm:flex-row overflow-y: auto w-7/10 h-7/10 items-center">
+      <div className="flex flex-col justify-center sm:flex-row overflow-y: auto w-7/10 h-7/10 items-center gap-6">
         {/* loginLeft div and loginRight div using flex-1, cuz flex-row is default, so the two div distributed in x axis */}
         {/*loginLeft */}
         <div className="flex-1 flex-col justify-center items-center ">

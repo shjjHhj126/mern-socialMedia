@@ -32,7 +32,7 @@ export default function LogIn() {
       <div className="flex flex-col justify-center sm:flex-row overflow-y: auto w-7/10 h-7/10 items-center">
         {/* loginLeft div and loginRight div using flex-1, cuz flex-row is default, so the two div distributed in x axis */}
         {/*loginLeft */}
-        <div className="flex-1 flex-col justify-center items-center ">
+        <div className="flex-1 flex-col justify-center items-center">
           <h3 className="text-[#007FFF] text-5xl font-bold mb-3">fakebook</h3>
           <span className="font-semibold text-lg">
             Connect with friends and the world around you on Fakebook
