@@ -7,6 +7,7 @@ import {
   logInStart,
   logInSuccess,
 } from "../redux/user/userSlice";
+import { TiSocialInstagram } from "react-icons/ti";
 
 export default function LogIn() {
   const [formData, setFormData] = useState({});
@@ -43,19 +44,24 @@ export default function LogIn() {
   };
 
   return (
-    <div className="bg-[#f0f2f5] flex justify-center items-center min-h-screen">
+    <div className=" w-full h-[100vh] flex items-center justify-center p-6">
       {/*loginWrapper */}
-      <div className="flex flex-col justify-center sm:flex-row overflow-y: auto w-7/10 h-7/10 items-center">
+      <div className="w-full md:w-2/3 h-fit lg:h-full 2xl:h-5/6 py-8 flex rounded-xl overflow-hidden shadow-xl">
         {/* loginLeft div and loginRight div using flex-1, cuz flex-row is default, so the two div distributed in x axis */}
         {/*loginLeft */}
-        <div className="flex-1 flex-col justify-center items-center">
-          <h3 className="text-[#007FFF] text-5xl font-bold mb-3">fakebook</h3>
+        <div className="w-full lg:w-1/2 h-full p-10 2xl:px-20 flex flex-col justify-center">
+          <TiSocialInstagram className="text-8xl text-pink-500" />
+          <span
+            style={{ fontFamily: "Cursive" }}
+            className=" text-black text-6xl w-full flex gap-2 items-center mb-6">
+            Instotgram
+          </span>
           <span className="font-semibold text-lg">
-            Connect with friends and the world around you on Fakebook
+            Connect with friends and the world around you on instogram
           </span>
         </div>
         {/*loginRight*/}
-        <div className="flex-1 flex-col justify-center m-5">
+        <div className="flex-1 flex-col justify-center items-center m-5">
           <form
             onSubmit={handleSubmit}
             className="bg-white flex flex-col  h-[400px] p-5 rounded-lg gap-7">
