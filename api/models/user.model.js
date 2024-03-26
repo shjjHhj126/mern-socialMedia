@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 6,
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
     coverPicture: {
       type: String,
       default: "",

@@ -47,4 +47,12 @@ const login = async (req, res, next) => {
     next(err);
   }
 };
-module.exports = { signup, login };
+const logout = (req, res, next) => {
+  try {
+    res.clearCookie("access_token");
+    res.status(200).json("User has been logged out!");
+  } catch (err) {
+    next(err);
+  }
+};
+module.exports = { signup, login, logout };
