@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { RiLogoutBoxRLine } from "react-icons/ri";
+import { IoIosLogOut } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import {
   logOutStart,
@@ -30,7 +30,7 @@ export default function Topbar() {
     }
   };
   return (
-    <section className="sticky top-0 z-50 md:hidden bg-white w-full">
+    <section className="sticky top-0 z-50 md:hidden bg-green-500 w-full">
       <div className="flex justify-between py-4 px-5">
         <Link to="/" className="flex gap-3 items-center">
           <img
@@ -39,11 +39,16 @@ export default function Topbar() {
             width="30px"
             height="30px"
           />
+          <span
+            style={{ fontFamily: "Cursive" }}
+            className="text-2xl text-pink-500">
+            Instogram
+          </span>
         </Link>
 
         <div className="flex gap-4">
           <button onClick={handleLogout}>
-            <RiLogoutBoxRLine className="text-3xl text-gray-500" />
+            <IoIosLogOut className="text-3xl text-gray-500" />
           </button>
           <Link to={`/profile/${currentUser._id}`}>
             <img

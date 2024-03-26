@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { TiSocialInstagram } from "react-icons/ti";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -22,6 +23,7 @@ export default function SignUp() {
       });
       const res = res1.data;
       console.log(res);
+      navigate("/log-in");
     } catch (err) {
       console.log(err);
     }

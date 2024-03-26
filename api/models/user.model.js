@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      default: "anonymous",
+      min: 3,
+      max: 20,
+    },
     username: {
       type: String,
       require: true,
@@ -9,6 +15,7 @@ const UserSchema = new mongoose.Schema(
       max: 20,
       unique: true,
     },
+
     email: {
       type: String,
       required: true,
