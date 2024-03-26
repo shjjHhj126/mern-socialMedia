@@ -30,7 +30,7 @@ export default function Topbar() {
     }
   };
   return (
-    <section className="sticky top-0 z-50 md:hidden bg-green-500 w-full">
+    <section className="sticky top-0 z-50 md:hidden bg-slate-100 w-full">
       <div className="flex justify-between py-4 px-5">
         <Link to="/" className="flex gap-3 items-center">
           <img

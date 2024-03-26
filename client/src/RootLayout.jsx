@@ -2,7 +2,7 @@ import React from "react";
 import Topbar from "./components/Topbar";
 import Leftbar from "./components/Leftbar";
 import { Outlet } from "react-router-dom";
-import Buttombar from "./components/Buttombar";
+import Bottombar from "./components/Bottombar";
 
 export default function RootLayout() {
   return (
@@ -14,7 +14,7 @@ export default function RootLayout() {
         <Outlet />
       </section>
 
-      <Buttombar />
+      <Bottombar />
     </div>
   );
 }
