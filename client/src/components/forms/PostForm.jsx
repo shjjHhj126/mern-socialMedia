@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RxCrossCircled } from "react-icons/rx";
 import { IoMdImages } from "react-icons/io";
+import { resolve } from "any-promise";
 
 export default function PostForm() {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ export default function PostForm() {
   });
   const [imgAndPurls, setImgAndPurls] = useState([]);
   const [imgFiles, setImgFiles] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const fileInput = useRef(null);
   const dispatch = useDispatch();
@@ -28,12 +30,23 @@ export default function PostForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    if (formData.caption === "") {
+      setErrorMsg("caption required!");
+      return;
+    } else if (imgAndPurls.length == 0) {
+      setErrorMsg("at least one image!");
+      return;
+    } else if (imgAndPurls.length > 6) {
+      setErrorMsg("at most 6 images!");
+      return;
+    }
+
     try {
       setFormData({ ...formData, userId: currentUser._id });
       copyFilesFromImgAndPurls();
-      imgFiles.map((imgFile) => {
-        uploadImageFiles(imgFile);
-      });
+
+      handleImageSubmit();
 
       // axios post
 
@@ -42,8 +55,22 @@ export default function PostForm() {
       console.log(err);
     }
   };
+  const handleImageSubmit = () => {
+    const promises = [];
+    for (let i = 0; i < imgFiles.length; i++) {
+      promises.push(uploadImageFile(imgFiles[i]));
+    }
 
-  const uploadImageFiles = async (imageFile) => {
+    Promise.all([promises])
+      .then((urls) => {
+        setFormData({ ...formData, images: formData.images.concat(urls) });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const uploadImageFile = async (imageFile) => {
     try {
       const storage = getStorage(app);
       const fileName = new Date().getTime() + imageFile.name;
@@ -59,14 +86,12 @@ export default function PostForm() {
         },
         (error) => {
           // Handle upload error
-          console.log(error);
+          reject(error);
         },
-        async () => {
+        () => {
           // Upload completed successfully
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setFormData({
-            ...formData,
-            images: [...formData.images, downloadURL],
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
           });
         }
       );
@@ -87,6 +112,7 @@ export default function PostForm() {
   };
 
   const handleFiles = (files) => {
+    setErrorMsg("");
     //The Array.from() static method creates a new, shallow-copied Array instance from an iterable or array-like object.
     const filesWithUrls = Array.from(files).map((file) => {
       const previewUrl = URL.createObjectURL(file);
@@ -116,6 +142,7 @@ export default function PostForm() {
   }; //prevUrls get the previous state, async stuff
 
   const handleChange = (e) => {
+    setErrorMsg("");
     if (e.target.id === "location" || e.target.id === "caption") {
       setFormData({ ...formData, [e.target.id]: e.target.value });
     }
@@ -131,14 +158,17 @@ export default function PostForm() {
         <label>Caption</label>
         <textarea
           id="caption"
+          required
+          minLength={5} //at least enter 5 chars
           onChange={handleChange}
+          value={formData.caption}
           className="border border-orange-500 p-3 rounded-lg h-[120px]"></textarea>
       </div>
 
       {/*Images */}
       <div className="flex flex-col gap-2">
         <label>Upload Images</label>
-        {/*ImageWrapper */}
+        {/*ImageDropzone */}
         <div className="flex flex-col gap-4">
           {/*drag and drop zone */}
           {/*fileInput.current.click() in <div> coresponding to fileInput in <input/> */}
@@ -157,10 +187,12 @@ export default function PostForm() {
               ref={fileInput}
               hidden
               multiple
+              required
+              minLength={1}
               onChange={(e) => handleFiles(e.target.files)}
             />
           </div>
-          {/*images */}
+          {/*show images */}
           <div className="flex flex-wrap gap-2">
             {imgAndPurls.length > 0 &&
               imgAndPurls.map((imgAndPurl, index) => {
@@ -197,6 +229,7 @@ export default function PostForm() {
           onChange={handleChange}
           id="location"
           type="text"
+          value={formData.location}
           className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
 
@@ -209,6 +242,7 @@ export default function PostForm() {
           onChange={handleChange}
           className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
+      {errorMsg && <p className="text-red-500">{errorMsg}</p>}
       <div className="flex gap-2 right-0 ml-auto">
         <button
           className="transparent border border-solid border-orange-500 text-orange-500 p-2 rounded-lg hover:opacity-95"
@@ -217,7 +251,8 @@ export default function PostForm() {
           Cancel
         </button>
         <button
-          className="bg-orange-500 text-white p-2 rounded-lg hover:opacity-95"
+          disabled={errorMsg !== ""}
+          className="bg-orange-500 text-white p-2 rounded-lg hover:opacity-95 disabled:opacity-80"
           onClick={handleSubmit}>
           Create Post
         </button>
