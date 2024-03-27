@@ -191,9 +191,9 @@ export default function PostForm() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row border-solid border-[1px] border-orange-500 h-[1000px] md:h-[650px]">
+    <div className="flex flex-col md:flex-row border-dashed border-[1px] border-orange-500 h-[1000px] ">
       {/*Leftpart : show images */}
-      <div className="flex-1 flex-wrap gap-2 md:w-1/2 h-auto w-full border-r-[2px] overflow-scroll custom-scrollbar">
+      <div className="flex-1 flex-wrap gap-2 md:w-1/2 min-h-[200px] w-full overflow-scroll custom-scrollbar">
         {/*Leftpart : wrapper */}
         <div className="flex flex-wrap">
           {imgAndPurls.length > 0 &&
