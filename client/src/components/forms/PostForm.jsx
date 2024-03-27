@@ -191,111 +191,114 @@ export default function PostForm() {
   };
 
   return (
-    <form className="flex flex-col flex- start gap-9 w-full">
-      {/*Caption */}
-      <div className="flex flex-col gap-2">
-        <label>Caption</label>
-        <textarea
-          id="caption"
-          required
-          minLength={5} //at least enter 5 chars
-          onChange={handleChange}
-          value={formData.caption}
-          className="border border-orange-500 p-3 rounded-lg h-[120px]"></textarea>
-      </div>
-      {/*Images */}
-      <div className="flex flex-col gap-2">
-        <label>Upload Images</label>
-        {/*ImageDropzone */}
-        <div className="flex flex-col gap-4">
-          {/*drag and drop zone */}
-          {/*fileInput.current.click() in <div> coresponding to fileInput in <input/> */}
-          <div
-            onDragOver={handleOnDragOver}
-            onDrop={handleOnDrop}
-            onClick={() => fileInput.current.click()}
-            className="flex flex-col items-center justify-center border border-orange-500 border-w-2 w-full h-[100px] rounded-lg">
-            <IoMdImages className="text-3xl text-gray-400" />
-            <p className="text-gray-400">
-              Click to select or Drag and drop image here....
-            </p>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInput}
-              hidden
-              multiple
-              required
-              minLength={1}
-              onChange={(e) => handleFiles(e.target.files)}
-            />
-          </div>
-          {/*show images */}
-          <div className="flex flex-wrap gap-2">
-            {imgAndPurls.length > 0 &&
-              imgAndPurls.map((imgAndPurl, index) => {
-                // Perform optional chaining here
-                const hasPreviewUrl = imgAndPurl.previewUrl;
+    <div className="flex flex-col md:flex-row border-solid border-[1px] border-orange-500 h-[1000px] md:h-[650px]">
+      {/*Leftpart : show images */}
+      <div className="flex-1 flex-wrap gap-2 md:w-1/2 h-auto w-full border-r-[2px] overflow-scroll custom-scrollbar">
+        {/*Leftpart : wrapper */}
+        <div className="flex flex-wrap">
+          {imgAndPurls.length > 0 &&
+            imgAndPurls.map((imgAndPurl, index) => {
+              // Perform optional chaining here
+              const hasPreviewUrl = imgAndPurl.previewUrl;
 
-                return (
-                  hasPreviewUrl && (
-                    <div key={index} className="flex">
-                      <img
-                        className="h-40 w-50 object-cover rounded-lg"
-                        src={imgAndPurl.previewUrl} // Use imageFile.previewUrl instead of 'url'
-                        alt="image"
-                      />
-                      <button
-                        type="button"
-                        className="-ml-5 -mt-[15px] h-8"
-                        onMouseUp={() => handleDeleteImage(imgAndPurl)} // Pass imageFile instead of 'url' to handleDeleteImage
-                      >
-                        <RxCrossCircled className="bg-white text-orange-500 rounded-full text-3xl" />
-                      </button>
-                    </div>
-                  )
-                );
-              })}
-          </div>
+              return (
+                hasPreviewUrl && (
+                  <div key={index} className="flex p-3 w-[180px] md:w-[210px]">
+                    <img
+                      className="h-[180px] w-[180px] md:w-[210px] object-cover rounded-lg"
+                      src={imgAndPurl.previewUrl} // Use imageFile.previewUrl instead of 'url'
+                      alt="image"
+                    />
+                    <button
+                      type="button"
+                      className="-ml-5 -mt-[15px] h-8"
+                      onMouseUp={() => handleDeleteImage(imgAndPurl)} // Pass imageFile instead of 'url' to handleDeleteImage
+                    >
+                      <RxCrossCircled className="bg-white text-orange-500 rounded-full text-3xl" />
+                    </button>
+                  </div>
+                )
+              );
+            })}
         </div>
       </div>
-      {/*Location */}
-      <div className="flex flex-col gap-2 ">
-        <label>Add Location</label>
+
+      {/*Rightpart : input areas */}
+      <form className=" flex-1 flex flex-col flex-start md:w-1/2 w-full h-full relative">
+        {/*Caption */}
+        <div className="flex flex-col gap-2">
+          <textarea
+            id="caption"
+            required
+            minLength={5} //at least enter 5 chars
+            onChange={handleChange}
+            value={formData.caption}
+            placeholder="Write a caption..."
+            className="border border-gray-300 border-w-2 p-3 h-[120px]"></textarea>
+        </div>
+
+        {/*Images */}
+        {/*fileInput.current.click() in <div> coresponding to fileInput in <input/> */}
+        <div
+          onDragOver={handleOnDragOver}
+          onDrop={handleOnDrop}
+          onClick={() => fileInput.current.click()}
+          className="flex flex-col items-center justify-center border border-gray-300 border-w-2 w-full h-[100px]">
+          <IoMdImages className="text-3xl text-gray-400" />
+          <p className="text-gray-400">
+            Click to select or Drag and drop image here....
+          </p>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInput}
+            hidden
+            multiple
+            required
+            minLength={1}
+            onChange={(e) => handleFiles(e.target.files)}
+          />
+        </div>
+
+        {/*Location */}
         <input
           onChange={handleChange}
           id="location"
           type="text"
+          placeholder="Add Location..."
           value={formData.location}
-          className="border border-orange-500 p-3 rounded-lg"></input>
-      </div>
-      {/*Add Tags*/}
-      <div className="flex flex-col gap-2 ">
-        <label>Add Tags (seperated by comma ",")</label>
+          className="border border-gray-300 border-w-2 p-3 w-full"></input>
+        {/*Add Tags*/}
         <input
           id="tags"
           type="text"
           onChange={handleChange}
-          className="border border-orange-500 p-3 rounded-lg"></input>
-      </div>
-      {errorMsg && <p className="text-red-500">{errorMsg}</p>}
-      <ToastContainer />
-      <div className="flex gap-2 right-0 ml-auto">
-        <div className="flex gap-2 right-0 ml-auto"></div>
-        <button
-          className="transparent border border-solid border-orange-500 text-orange-500 p-2 rounded-lg hover:opacity-95"
-          type="button"
-          onClick={() => navigate(-1)}>
-          Cancel
-        </button>
-        <button
-          disabled={errorMsg !== "" || creating === true}
-          className="bg-orange-500 text-white p-2 rounded-lg hover:opacity-95 disabled:opacity-80"
-          onClick={handleSubmit}>
-          {creating === true ? "Creating..." : "Create Post"}
-        </button>
-      </div>
-    </form>
+          placeholder="Add Tags (seperated by comma ',')..."
+          className="border border-gray-300 border-w-2 p-3 w-full"></input>
+        {errorMsg && <p className="text-red-500">{errorMsg}</p>}
+        <ToastContainer />
+
+        {/*buttons */}
+        {/*flex-1 and h-full make sure the outer div take the remaining space,flex-col specifys the direction */}
+        <div className="flex-1  h-full flex flex-col justify-end">
+          {/*inner div make sure the buttons are flex-row */}
+          <div className=" flex m-5">
+            <button
+              className="transparent border border-solid rounded-s-md border-orange-500 text-orange-500 p-2 w-1/2 hover:opacity-95"
+              type="button"
+              onClick={() => navigate(-1)}>
+              Cancel
+            </button>
+            <button
+              disabled={errorMsg !== "" || creating === true}
+              className="bg-orange-500 text-white p-2 w-1/2 rounded-e-md hover:opacity-95 disabled:opacity-80"
+              onClick={handleSubmit}>
+              {creating === true ? "Creating..." : "Create Post"}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }
 // ml-auto in bottom div for buttons : applying ml-auto to the <div> element makes it take up all the available space to its left, effectively pushing it to the right edge of the form container.

@@ -58,4 +58,22 @@ const getPost = async (req, res, next) => {
     next(err);
   }
 };
-module.exports = { createPost, deletePost, getPost, updatePost };
+
+const getRecentPosts = async (req, res, next) => {
+  try {
+    const recentPosts = await postModel
+      .find()
+      .sort({ createdAt: "desc" })
+      .limit(20);
+    res.status(200).json(recentPosts);
+  } catch (err) {
+    next(err);
+  }
+};
+module.exports = {
+  createPost,
+  deletePost,
+  getPost,
+  updatePost,
+  getRecentPosts,
+};
