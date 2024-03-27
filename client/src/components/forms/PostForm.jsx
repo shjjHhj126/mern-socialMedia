@@ -10,105 +10,143 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RxCrossCircled } from "react-icons/rx";
 import { IoMdImages } from "react-icons/io";
-import { resolve } from "any-promise";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PostForm() {
   const [formData, setFormData] = useState({
     userId: "",
     caption: "",
-    images: [],
+    images: null,
     location: "",
     tags: [],
   });
   const [imgAndPurls, setImgAndPurls] = useState([]);
-  const [imgFiles, setImgFiles] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [creating, setCreating] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
   const fileInput = useRef(null);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  let imgFiles = [];
+  let downloadURLs = [];
+  let toastId = null;
+  // do not use setter created by hook, they are sync, but is scheduled to executed(so will not executed immediately)
+  // state in react ony used to re-render, imgFiles is not responsible to re-render, so use let
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+    setCreating(true);
     if (formData.caption === "") {
       setErrorMsg("caption required!");
+      setCreating(false);
       return;
-    } else if (imgAndPurls.length == 0) {
+    } else if (imgAndPurls.length === 0) {
       setErrorMsg("at least one image!");
+      setCreating(false);
       return;
     } else if (imgAndPurls.length > 6) {
       setErrorMsg("at most 6 images!");
+      setCreating(false);
       return;
     }
 
     try {
-      setFormData({ ...formData, userId: currentUser._id });
-      copyFilesFromImgAndPurls();
-
-      handleImageSubmit();
-
-      // axios post
-
-      navigate("/");
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const handleImageSubmit = () => {
-    const promises = [];
-    for (let i = 0; i < imgFiles.length; i++) {
-      promises.push(uploadImageFile(imgFiles[i]));
-    }
-
-    Promise.all([promises])
-      .then((urls) => {
-        setFormData({ ...formData, images: formData.images.concat(urls) });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const uploadImageFile = async (imageFile) => {
-    try {
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + imageFile.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // Update progress if needed
-        },
-        (error) => {
-          // Handle upload error
-          reject(error);
-        },
-        () => {
-          // Upload completed successfully
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            resolve(downloadURL);
-          });
+      const initialToastId = toast.info(
+        "Creating post...(it may last for a few seconds).",
+        {
+          autoClose: false,
         }
       );
-    } catch (error) {
-      console.log("Error uploading file:", error);
+      toastId = initialToastId;
+
+      copyFilesFromImgAndPurls();
+
+      await handleImageUpload();
+
+      await axios.post(
+        "api/post/create",
+        {
+          ...formData,
+          images: downloadURLs,
+          userId: currentUser._id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setCreating(true);
+
+      toast.update(toastId, {
+        onClose: () => navigate("/"),
+        render: "Images created successfully!",
+        type: "success",
+        autoClose: 1000,
+      });
+    } catch (err) {
+      console.log(err);
+      setErrorMsg("An error occurred during image upload.");
+      setCreating(false);
     }
+  };
+
+  const handleImageUpload = async () => {
+    for (const imgFile of imgFiles) {
+      try {
+        const downloadURL = await uploadImageFilePromise(imgFile);
+        downloadURLs.push(downloadURL);
+        // console.log("downloadURL", downloadURL);
+      } catch (error) {
+        console.error("Image upload error:", error);
+      }
+    }
+  };
+
+  const uploadImageFilePromise = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const storage = getStorage(app);
+        const fileName = new Date().getTime() + imageFile.name;
+        const storageRef = ref(storage, fileName);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            // Update progress if needed
+          },
+          (error) => {
+            // Handle upload error
+            console.error("Upload error:", error);
+            reject(error);
+          },
+          () => {
+            try {
+              console.log("Success");
+              const downloadURL = getDownloadURL(uploadTask.snapshot.ref);
+              resolve(downloadURL);
+            } catch (error) {
+              reject(error);
+            }
+          }
+        );
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        reject(error);
+      }
+    });
   };
 
   const copyFilesFromImgAndPurls = () => {
-    setImgFiles((previmgFiles) => {
-      return imgAndPurls.map((imgAndPurl) => {
-        // console.log(imgAndPurl.file);
-        return imgAndPurl.file;
-      });
+    imgFiles = imgAndPurls.map((imgAndPurl) => {
+      // console.log(imgAndPurl.file);
+      return imgAndPurl.file;
     });
-    // console.log("hi");
-    // console.log(imgFiles);
   };
 
   const handleFiles = (files) => {
@@ -151,6 +189,7 @@ export default function PostForm() {
       setFormData({ ...formData, tags });
     }
   };
+
   return (
     <form className="flex flex-col flex- start gap-9 w-full">
       {/*Caption */}
@@ -164,7 +203,6 @@ export default function PostForm() {
           value={formData.caption}
           className="border border-orange-500 p-3 rounded-lg h-[120px]"></textarea>
       </div>
-
       {/*Images */}
       <div className="flex flex-col gap-2">
         <label>Upload Images</label>
@@ -221,7 +259,6 @@ export default function PostForm() {
           </div>
         </div>
       </div>
-
       {/*Location */}
       <div className="flex flex-col gap-2 ">
         <label>Add Location</label>
@@ -232,7 +269,6 @@ export default function PostForm() {
           value={formData.location}
           className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
-
       {/*Add Tags*/}
       <div className="flex flex-col gap-2 ">
         <label>Add Tags (seperated by comma ",")</label>
@@ -243,7 +279,9 @@ export default function PostForm() {
           className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
       {errorMsg && <p className="text-red-500">{errorMsg}</p>}
+      <ToastContainer />
       <div className="flex gap-2 right-0 ml-auto">
+        <div className="flex gap-2 right-0 ml-auto"></div>
         <button
           className="transparent border border-solid border-orange-500 text-orange-500 p-2 rounded-lg hover:opacity-95"
           type="button"
@@ -251,10 +289,10 @@ export default function PostForm() {
           Cancel
         </button>
         <button
-          disabled={errorMsg !== ""}
+          disabled={errorMsg !== "" || creating === true}
           className="bg-orange-500 text-white p-2 rounded-lg hover:opacity-95 disabled:opacity-80"
           onClick={handleSubmit}>
-          Create Post
+          {creating === true ? "Creating..." : "Create Post"}
         </button>
       </div>
     </form>
