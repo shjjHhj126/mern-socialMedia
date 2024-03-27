@@ -6,32 +6,47 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RxCrossCircled } from "react-icons/rx";
 import { IoMdImages } from "react-icons/io";
 
 export default function PostForm() {
-  const fileInput = useRef(null);
   const [formData, setFormData] = useState({
-    images: [],
+    userId: "",
     caption: "",
+    images: [],
     location: "",
     tags: [],
   });
-  const [previewUrls, setPreviewUrls] = useState([]);
+  const [imgAndPurls, setImgAndPurls] = useState([]);
+  const [imgFiles, setImgFiles] = useState([]);
+  const { currentUser } = useSelector((state) => state.user);
+  const fileInput = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleFileUpload = (e) => {
-    acceptedFiles.map((file) => {
-      const fileName = new Date().getTime() + file.name;
-      uploadFile(file, fileName);
-      return fileName;
-    });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
+      setFormData({ ...formData, userId: currentUser._id });
+      copyFilesFromImgAndPurls();
+      imgFiles.map((imgFile) => {
+        uploadImageFiles(imgFile);
+      });
+
+      // axios post
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const uploadFile = async (file, fileName) => {
+  const uploadImageFiles = async (imageFile) => {
     try {
       const storage = getStorage(app);
+      const fileName = new Date().getTime() + imageFile.name;
       const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
       uploadTask.on(
         "state_changed",
@@ -51,7 +66,6 @@ export default function PostForm() {
             ...formData,
             images: [...formData.images, downloadURL],
           });
-          setFileMapping({ ...fileMapping, fileName: downloadURL });
         }
       );
     } catch (error) {
@@ -59,12 +73,25 @@ export default function PostForm() {
     }
   };
 
+  const copyFilesFromImgAndPurls = () => {
+    setImgFiles((previmgFiles) => {
+      return imgAndPurls.map((imgAndPurl) => {
+        // console.log(imgAndPurl.file);
+        return imgAndPurl.file;
+      });
+    });
+    // console.log("hi");
+    // console.log(imgFiles);
+  };
+
   const handleFiles = (files) => {
     //The Array.from() static method creates a new, shallow-copied Array instance from an iterable or array-like object.
-    const fileURLs = Array.from(files).map((file) => URL.createObjectURL(file));
-
+    const filesWithUrls = Array.from(files).map((file) => {
+      const previewUrl = URL.createObjectURL(file);
+      return { file, previewUrl };
+    }); //{file:file, previewUrl:previewUrl}
     // Concatenate the new file URLs with the existing previewUrls array
-    setPreviewUrls((prevUrls) => [...prevUrls, ...fileURLs]);
+    setImgAndPurls((prevImgAndPurls) => [...prevImgAndPurls, ...filesWithUrls]);
   };
 
   const handleOnDragOver = (e) => {
@@ -74,22 +101,36 @@ export default function PostForm() {
     event.preventDefault(); //prevent the browser from opening the image
     event.stopPropagation(); // stop the event (in this case, a drop event) from bubbling up the DOM tree.
 
-    let imageFiles = event.dataTransfer.files;
-    handleFiles(imageFiles);
+    let files = event.dataTransfer.files;
+    handleFiles(files);
   };
 
-  const handleDeleteImage = (URL) => {
-    setPreviewUrls((prevUrls) => {
-      return prevUrls.filter((url) => url !== URL);
+  const handleDeleteImage = (img_url) => {
+    setImgAndPurls((prevImgAndPurls) => {
+      return prevImgAndPurls.filter(
+        (imgAndPurl) => imgAndPurl.previewUrl !== img_url.previewUrl
+      );
     });
   }; //prevUrls get the previous state, async stuff
 
+  const handleChange = (e) => {
+    if (e.target.id === "location" || e.target.id === "caption") {
+      setFormData({ ...formData, [e.target.id]: e.target.value });
+    }
+    if (e.target.id === "tags") {
+      const tags = e.target.value.split(",");
+      setFormData({ ...formData, tags });
+    }
+  };
   return (
     <form className="flex flex-col gap-9 w-full">
       {/*Caption */}
       <div className="flex flex-col gap-2">
         <label>Caption</label>
-        <textarea className="border border-orange-500 p-2 rounded-lg"></textarea>
+        <textarea
+          id="caption"
+          onChange={handleChange}
+          className="border border-orange-500 p-3 rounded-lg h-[120px]"></textarea>
       </div>
 
       {/*Images */}
@@ -119,40 +160,57 @@ export default function PostForm() {
           </div>
           {/*images */}
           <div className="flex flex-wrap gap-2">
-            {previewUrls.length > 0 &&
-              previewUrls.map((url, index) => (
-                <div key={index} className="flex">
-                  <img
-                    className="h-40 w-50 object-cover rounded-lg"
-                    src={url}
-                    alt="image"
-                  />
-                  <button
-                    type="button" //ahhhhhhh!
-                    className="-ml-5 -mt-[15px] h-8"
-                    onMouseUp={() => handleDeleteImage(url)}>
-                    <RxCrossCircled className="bg-white text-orange-500 rounded-full text-3xl" />
-                  </button>
-                </div>
-              ))}
+            {imgAndPurls.length > 0 &&
+              imgAndPurls.map((imgAndPurl, index) => {
+                // Perform optional chaining here
+                const hasPreviewUrl = imgAndPurl.previewUrl;
+
+                return (
+                  hasPreviewUrl && (
+                    <div key={index} className="flex">
+                      <img
+                        className="h-40 w-50 object-cover rounded-lg"
+                        src={imgAndPurl.previewUrl} // Use imageFile.previewUrl instead of 'url'
+                        alt="image"
+                      />
+                      <button
+                        type="button"
+                        className="-ml-5 -mt-[15px] h-8"
+                        onMouseUp={() => handleDeleteImage(imgAndPurl)} // Pass imageFile instead of 'url' to handleDeleteImage
+                      >
+                        <RxCrossCircled className="bg-white text-orange-500 rounded-full text-3xl" />
+                      </button>
+                    </div>
+                  )
+                );
+              })}
           </div>
         </div>
       </div>
 
       {/*Location */}
-      <div>
+      <div className="flex flex-col gap-2 ">
         <label>Add Location</label>
-        <input id="location" type="text"></input>
+        <input
+          onChange={handleChange}
+          id="location"
+          type="text"
+          className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
 
       {/*Add Tags*/}
-      <div>
+      <div className="flex flex-col gap-2 ">
         <label>Add Tags (seperated by comma ",")</label>
-        <input id="tags" type="text"></input>
+        <input
+          id="tags"
+          type="text"
+          onChange={handleChange}
+          className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
-      {/* <button type="button" onClick={handleFileUpload}>
-        Upload image
-      </button> */}
+      <button type="button" onClick={() => navigate(-1)}>
+        Cancel
+      </button>
+      <button onClick={handleSubmit}>Create Post</button>
     </form>
   );
 }
