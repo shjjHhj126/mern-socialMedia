@@ -36,6 +36,8 @@ export default function PostForm() {
       });
 
       // axios post
+
+      navigate("/");
     } catch (err) {
       console.log(err);
     }
@@ -123,7 +125,7 @@ export default function PostForm() {
     }
   };
   return (
-    <form className="flex flex-col gap-9 w-full">
+    <form className="flex flex-col flex- start gap-9 w-full">
       {/*Caption */}
       <div className="flex flex-col gap-2">
         <label>Caption</label>
@@ -207,10 +209,20 @@ export default function PostForm() {
           onChange={handleChange}
           className="border border-orange-500 p-3 rounded-lg"></input>
       </div>
-      <button type="button" onClick={() => navigate(-1)}>
-        Cancel
-      </button>
-      <button onClick={handleSubmit}>Create Post</button>
+      <div className="flex gap-2 right-0 ml-auto">
+        <button
+          className="transparent border border-solid border-orange-500 text-orange-500 p-2 rounded-lg hover:opacity-95"
+          type="button"
+          onClick={() => navigate(-1)}>
+          Cancel
+        </button>
+        <button
+          className="bg-orange-500 text-white p-2 rounded-lg hover:opacity-95"
+          onClick={handleSubmit}>
+          Create Post
+        </button>
+      </div>
     </form>
   );
 }
+// ml-auto in bottom div for buttons : applying ml-auto to the <div> element makes it take up all the available space to its left, effectively pushing it to the right edge of the form container.
