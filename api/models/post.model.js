@@ -22,10 +22,7 @@ const PostSchema = new mongoose.Schema(
       default: [],
       require: true,
     },
-    likes: {
-      type: Array,
-      default: [],
-    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     location: {
       type: String,
       default: null,
@@ -34,6 +31,7 @@ const PostSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   },
   { timestamps: true }
 );

@@ -35,22 +35,12 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    followers: {
-      type: Array,
-      default: [],
-    },
-    followings: {
-      type: Array,
-      default: [],
-    },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    followings: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     isAdmin: {
       type: Boolean,
       default: false,
     },
-    // desc: {
-    //   type: String,
-    //   max: 50,
-    // },
     city: {
       type: String,
       max: 50,
@@ -59,11 +49,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       max: 50,
     },
-    // relationship: {
-    //   type: Number,
-    //   enum: [1, 2, 3],
-    // },
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    saved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
   },
   { timestamps: true }
 );

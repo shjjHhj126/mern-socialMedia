@@ -8,7 +8,7 @@ const createPost = async (req, res, next) => {
     const newPost = new postModel(req.body);
     await newPost.save();
 
-    // add the new post into user's data
+    // add the new post into user data
     const creator = await userModel.findById(req.body.creator);
     creator.posts.push(newPost._id);
     await creator.save();
@@ -20,7 +20,7 @@ const createPost = async (req, res, next) => {
 };
 const deletePost = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(404).json({ message: "Post not found" });
+    return next(errorHandler(401, "Post not found"));
   }
   const post = await postModel.findById(req.params.id);
   if (req.user.id !== post.userId) {
@@ -44,12 +44,12 @@ const deletePost = async (req, res, next) => {
 
 const updatePost = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(404, "Post not found");
+    return next(errorHandler(401, "Post not found"));
   }
-  const post = await postModel.findById(req.params.id);
-  if (post.userId !== req.user.id) {
+  if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
     return next(errorHandler(401, "You can only update your own post"));
   }
+
   const updatedPost = await postModel.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -57,9 +57,10 @@ const updatePost = async (req, res, next) => {
   );
   res.status(200).json(updatedPost);
 };
+
 const getPost = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(404, "Post not found");
+    return next(errorHandler(401, "Post not found"));
   }
   const post = await postModel.findById(req.params.id);
   if (post.userId !== req.user.id) {
@@ -85,11 +86,38 @@ const getRecentPosts = async (req, res, next) => {
     next(err);
   }
 };
+
+const updateLikes = async (req, res, next) => {
+  try {
+    // or if (!mongoose.Types.ObjectId.isValid(req.params.id))?
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(errorHandler(401, "Post not found, cannot updateLikes"));
+    }
+
+    const post = await postModel.findById(req.params.id);
+
+    const alreadyLiked = post.likes.includes(req.body.post._id);
+    if (req.body.like && !alreadyLiked) {
+      post.likes.push(req.user.id);
+    } else if (!req.body.like && alreadyLiked) {
+      post.likes = post.likes.filter((id) => id !== req.user);
+    }
+
+    await post.save();
+
+    res.status(200).json({ message: "Likes updated successfully", post });
+  } catch (error) {
+    // Handle errors
+    next(error);
+  }
+};
+
 module.exports = {
   createPost,
   deletePost,
   getPost,
   updatePost,
   getRecentPosts,
+  updateLikes,
 };
 // .populate('userId');!!

@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const userRoute = require("./routes/user.route");
 const authRoute = require("./routes/auth.route");
 const postRoute = require("./routes/post.route");
+const commentRoute = require("./routes/comment.route");
 dotenv.config();
 
 // connet to database
@@ -40,6 +41,7 @@ const testRouter = express.Router();
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
+app.use("/api/comment", commentRoute);
 
 //error handling middleware
 app.use((err, req, res, next) => {

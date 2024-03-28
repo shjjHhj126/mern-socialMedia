@@ -92,7 +92,7 @@ export default function LogIn() {
             <div className="flex flex-row items-center justify-center gap-2">
               <p>Do not have an account?</p>
               <Link
-                to={"/sign-in"}
+                to={"/sign-up"}
                 className="text-[#007FFF] font-semibold rounded-lg cursor-pointer">
                 <span> Signup </span>
               </Link>
