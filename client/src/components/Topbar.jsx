@@ -51,13 +51,7 @@ export default function Topbar() {
             <IoIosLogOut className="text-3xl text-gray-500" />
           </button>
           <Link to={`/profile/${currentUser._id}`}>
-            <img
-              src={
-                currentUser.avatar ||
-                "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg"
-              }
-              className="h-8 w-8 rounded-full"
-            />
+            <img src={currentUser.avatar} className="h-8 w-8 rounded-full" />
           </Link>
         </div>
       </div>

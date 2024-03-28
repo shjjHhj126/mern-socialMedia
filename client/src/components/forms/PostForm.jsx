@@ -16,9 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function PostForm() {
   const [formData, setFormData] = useState({
-    userId: "",
     caption: "",
-    images: null,
     location: "",
     tags: [],
   });
@@ -70,7 +68,7 @@ export default function PostForm() {
         {
           ...formData,
           images: downloadURLs,
-          userId: currentUser._id,
+          creator: currentUser._id,
         },
         {
           headers: {
@@ -191,9 +189,9 @@ export default function PostForm() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row border-dashed border-[1px] border-orange-500 h-[1000px] ">
+    <div className="flex flex-col md:flex-row border-dashed border-[1px] border-orange-500 h-[1000px] rounded-lg">
       {/*Leftpart : show images */}
-      <div className="flex-1 flex-wrap gap-2 md:w-1/2 min-h-[200px] w-full overflow-scroll custom-scrollbar">
+      <div className="flex-1 flex-wrap gap-2 md:w-1/2 min-h-[200px] w-full overflow-scroll custom-scrollbar md:rounded-tl-lg md:rounded-bl-lg bg-white">
         {/*Leftpart : wrapper */}
         <div className="flex flex-wrap">
           {imgAndPurls.length > 0 &&
@@ -224,7 +222,7 @@ export default function PostForm() {
       </div>
 
       {/*Rightpart : input areas */}
-      <form className=" flex-1 flex flex-col flex-start md:w-1/2 w-full h-full relative">
+      <form className=" flex-1 flex flex-col flex-start md:w-1/2 w-full h-full relative bg-white md:rounded-br-lg md:rounded-tr-lg md:rounded-bl-none rounded-b-lg">
         {/*Caption */}
         <div className="flex flex-col gap-2">
           <textarea
@@ -234,7 +232,7 @@ export default function PostForm() {
             onChange={handleChange}
             value={formData.caption}
             placeholder="Write a caption..."
-            className="border border-gray-300 border-w-2 p-3 h-[120px]"></textarea>
+            className="border border-b-1 border-w-2 p-3 h-[120px] lg:rounded-tr-lg"></textarea>
         </div>
 
         {/*Images */}
@@ -291,7 +289,7 @@ export default function PostForm() {
             </button>
             <button
               disabled={errorMsg !== "" || creating === true}
-              className="bg-orange-500 text-white p-2 w-1/2 rounded-e-md hover:opacity-95 disabled:opacity-80"
+              className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-2 w-1/2 rounded-e-md hover:opacity-95 disabled:opacity-80"
               onClick={handleSubmit}>
               {creating === true ? "Creating..." : "Create Post"}
             </button>

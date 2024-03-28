@@ -1,11 +1,18 @@
 const postModel = require("../models/post.model");
 const mongoose = require("mongoose");
+const userModel = require("../models/user.model");
 
 const createPost = async (req, res, next) => {
   try {
     console.log(req.body);
     const newPost = new postModel(req.body);
     await newPost.save();
+
+    // add the new post into user's data
+    const creator = await userModel.findById(req.body.creator);
+    creator.posts.push(newPost._id);
+    await creator.save();
+
     res.status(201).json("post created successfully!");
   } catch (err) {
     next(err);
@@ -21,7 +28,14 @@ const deletePost = async (req, res, next) => {
   }
 
   try {
+    // delete the post ref in user's data!
+    await userModel.findByIdAndUpdate(post.creator, {
+      $pull: { posts: post._id },
+    });
+
+    // then delete the post
     await postModel.findByIdAndDelete(req.params.id);
+
     res.status(200).json("Post has been deleted");
   } catch (err) {
     next(err);
@@ -63,6 +77,7 @@ const getRecentPosts = async (req, res, next) => {
   try {
     const recentPosts = await postModel
       .find()
+      .populate("creator")
       .sort({ createdAt: "desc" })
       .limit(20);
     res.status(200).json(recentPosts);
@@ -77,3 +92,4 @@ module.exports = {
   updatePost,
   getRecentPosts,
 };
+// .populate('userId');!!
