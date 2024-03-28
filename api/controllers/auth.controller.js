@@ -57,4 +57,50 @@ const logout = (req, res, next) => {
     next(err);
   }
 };
-module.exports = { signup, login, logout };
+//carefully handle all the data, or u may create orphan data!
+//haven't try this on postman
+const deleteAccount = async (req, res, next) => {
+  try {
+    // Find the user to be deleted
+    const user = await userModel.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Remove user from the 'likes' array in all posts
+    await postModel.updateMany(
+      { likes: user._id },
+      { $pull: { likes: user._id } }
+    );
+
+    // Delete comments authored by the user
+    await commentModel.deleteMany({ author: user._id });
+
+    // Remove user's comments from the 'comments' array in all posts
+    await postModel.updateMany(
+      { comments: user._id },
+      { $pull: { comments: user._id } }
+    );
+
+    // Remove the user from the 'followers' array in other user documents
+    await userModel.updateMany(
+      { followers: user._id },
+      { $pull: { followers: user._id } }
+    );
+
+    // Remove the user from the 'followings' array in other user documents
+    await userModel.updateMany(
+      { followings: user._id },
+      { $pull: { followings: user._id } }
+    );
+
+    // Delete the user account
+    await userModel.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "Account successfully deleted" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { signup, login, logout, deleteAccount };

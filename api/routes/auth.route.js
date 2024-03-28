@@ -1,5 +1,10 @@
 const router = require("express").Router();
-const { signup, login, logout } = require("../controllers/auth.controller");
+const {
+  signup,
+  login,
+  logout,
+  deleteAccount,
+} = require("../controllers/auth.controller");
 //sign up
 router.post("/signup", signup);
 
@@ -8,4 +13,7 @@ router.post("/login", login);
 
 //log out
 router.get("/logout", logout);
+
+//delete account
+router.delete("/delete/:id", deleteAccount);
 module.exports = router;
