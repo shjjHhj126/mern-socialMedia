@@ -4,7 +4,6 @@ const userModel = require("../models/user.model");
 
 const createPost = async (req, res, next) => {
   try {
-    console.log(req.body);
     const newPost = new postModel(req.body);
     await newPost.save();
 
@@ -89,18 +88,22 @@ const getRecentPosts = async (req, res, next) => {
 
 const updateLikes = async (req, res, next) => {
   try {
-    // or if (!mongoose.Types.ObjectId.isValid(req.params.id))?
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return next(errorHandler(401, "Post not found, cannot updateLikes"));
+    const post = await postModel.findById(req.params.id);
+    if (!post) {
+      return next(
+        errorHandler(404, "Post not found, cannot update like status")
+      );
     }
 
-    const post = await postModel.findById(req.params.id);
+    const user = await userModel.findById(req.user.id);
+    const alreadyLiked = post.likes.includes(post._id);
 
-    const alreadyLiked = post.likes.includes(req.body.post._id);
     if (req.body.like && !alreadyLiked) {
       post.likes.push(req.user.id);
+      user.likes.push(post._id);
     } else if (!req.body.like && alreadyLiked) {
       post.likes = post.likes.filter((id) => id !== req.user);
+      user.likes = user.likes.filter((id) => id !== post._id);
     }
 
     await post.save();

@@ -38,7 +38,7 @@ const deleteComment = async (req, res, next) => {
   }
 
   const post = await postModel.findById(req.body.post);
-  post.comments.filter((id) => id != req.params.id);
+  post.comments = post.comments.filter((id) => id != req.params.id);
   await post.save();
 
   await commentModel.findByIdAndDelete(req.params.id);
