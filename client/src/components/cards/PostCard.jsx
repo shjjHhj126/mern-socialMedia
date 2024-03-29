@@ -5,7 +5,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { FaRegComment } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { toggleBookmark } from "../../redux/user/userSlice";
+import { toggleBookmark, toggleFollow } from "../../redux/user/userSlice";
 import axios from "axios";
 import "./PostCard.css";
 import { useMutation } from "@tanstack/react-query";
@@ -24,6 +24,9 @@ export default function PostCard({ post }) {
   );
   const [likesLength, setLikesLength] = useState(post.likes.length);
   const [isMore, setIsMore] = useState(false);
+  const [followState, setFollowState] = useState(
+    currentUser.followings.includes(post.creator)
+  );
   const [comment, setComment] = useState("");
   // const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const navigate = useNavigate();
@@ -57,7 +60,7 @@ export default function PostCard({ post }) {
   const mutationComment = useMutation({
     mutationFn: (content) => {
       return axios.post(
-        `/api/comment/create`,
+        "/api/comment/create",
         { author: currentUser._id, post: post._id, content: content },
         {
           headers: { "Content-Type": "application/json" },
@@ -65,7 +68,17 @@ export default function PostCard({ post }) {
       );
     },
   });
-
+  const mutationFollow = useMutation({
+    mutationFn: (fo) => {
+      return axios.put(
+        `/api/user/updateFollow/${post.creator._id}`,
+        { follow: fo },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    },
+  });
   const handleLike = () => {
     setLikeState((prev) => !prev);
 
@@ -77,21 +90,26 @@ export default function PostCard({ post }) {
     dispatch(toggleBookmark(post._id));
     mutationBookmark.mutate(!bookmarkState);
   };
+  const handleFollow = () => {
+    setFollowState(!followState);
+    dispatch(toggleFollow(post.creator));
+    mutationFollow.mutate(!followState);
+  };
 
   // Handle the mutation success
-  useEffect(() => {
-    if (mutationLike.isSuccess) {
-      console.log(mutationLike.data);
-    }
-    if (mutationLike.isError) {
-      console.log(mutationLike.error);
-    }
-    if (mutationLike.data) {
-      setLikesLength(mutationLike.data.data.likesLength);
-    }
+  // useEffect(() => {
+  //   if (mutationLike.isSuccess) {
+  //     console.log(mutationLike.data);
+  //   }
+  //   if (mutationLike.isError) {
+  //     console.log(mutationLike.error);
+  //   }
+  //   if (mutationLike.data) {
+  //     setLikesLength(mutationLike.data.data.likesLength);
+  //   }
 
-    console.log(mutationLike.status);
-  }, [mutationLike]);
+  //   console.log(mutationLike.status);
+  // }, [mutationLike]);
 
   // useEffect(() => {
   //   if (mutationBookmark.isSuccess) {
@@ -104,16 +122,27 @@ export default function PostCard({ post }) {
   //   console.log(mutationBookmark.status);
   // }, [mutationBookmark]);
 
+  // useEffect(() => {
+  //   if (mutationComment.isSuccess) {
+  //     console.log(mutationComment.data);
+  //   }
+  //   if (mutationComment.isError) {
+  //     console.log(mutationComment.error);
+  //   }
+
+  //   console.log(mutationComment.status);
+  // }, [mutationComment]);
+
   useEffect(() => {
-    if (mutationComment.isSuccess) {
-      console.log(mutationComment.data);
+    if (mutationFollow.isSuccess) {
+      console.log(mutationFollow.data);
     }
-    if (mutationBookmark.isError) {
-      console.log(mutationComment.error);
+    if (mutationFollow.isError) {
+      console.log(mutationFollow.error);
     }
 
-    console.log(mutationComment.status);
-  }, [mutationComment]);
+    console.log(mutationFollow.status);
+  }, [mutationFollow]);
 
   // const handleEmojiClick = (e, emojiObject) => {
   //   setComment(comment + emojiObject.emoji);
@@ -142,7 +171,20 @@ export default function PostCard({ post }) {
           </Link>
           <p className="font-bold ">{post.creator.name}</p>
         </div>
-        {<button className="">Follow</button>}
+        {currentUser._id !== post.creator._id && !followState && (
+          <button
+            onClick={handleFollow}
+            className="bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-lg px-3 py-1">
+            Follow
+          </button>
+        )}
+        {currentUser._id !== post.creator._id && followState && (
+          <button
+            onClick={handleFollow}
+            className="text-orange-500 font-bold rounded-lg px-3 py-1">
+            Unfollow
+          </button>
+        )}
       </div>
 
       {/*image swapper */}

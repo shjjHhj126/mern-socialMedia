@@ -44,6 +44,18 @@ const userSlice = createSlice({
         currentUser.saved = [...currentUser.saved, postId];
       }
     },
+    toggleFollow: (state, action) => {
+      const userId = action.payload;
+      const currentUser = state.currentUser;
+
+      if (currentUser.followings.includes(userId)) {
+        currentUser.followings = currentUser.followings.filter(
+          (id) => id !== userId
+        );
+      } else {
+        currentUser.followings = [...currentUser.followings, userId];
+      }
+    },
   },
 });
 export const {
@@ -54,5 +66,6 @@ export const {
   logOutSuccess,
   logOutFailure,
   toggleBookmark,
+  toggleFollow,
 } = userSlice.actions;
 export default userSlice.reducer;

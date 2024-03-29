@@ -79,54 +79,49 @@ const updateSaved = async (req, res, next) => {
     next(err);
   }
 };
-const unfollow = async (req, res, next) => {
+
+const updateFollow = async (req, res, next) => {
   try {
+    console.log(req.body);
+    console.log(req.user.id);
+    console.log(req.params.id);
     const following = await userModel.findById(req.params.id);
-    const follower = await userModel.findById(req.user.id);
     if (!following) {
+      console.log("dfhd");
       return next(errorHandler(404, "following user not found"));
     }
+    const follower = await userModel.findById(req.user.id);
     if (!follower) {
+      console.log("dfdsgefghd");
       return next(errorHandler(404, "follower user not found"));
     }
 
-    if (following.followers.includes(req.user.id)) {
+    console.log(req.user.id, req.params.id);
+    //follow
+    if (
+      req.body.follow &&
+      !following.followers.includes(req.user.id) &&
+      !follower.followings.includes(req.params.id)
+    ) {
+      following.followers = [...following.followers, req.user.id];
+      follower.followings = [...follower.followings, req.params.id];
+    }
+    //unfollow
+    if (
+      !req.body.follow &&
+      following.followers.includes(req.user.id) &&
+      follower.followings.includes(req.params.id)
+    ) {
       following.followers = following.followers.filter(
         (id) => id.toString() !== req.user.id
       );
-    }
-    if (follower.followings.includes(req.params.id)) {
       follower.followings = follower.followings.filter(
         (id) => id.toString() !== req.params.id
       );
     }
     await follower.save();
     await following.save();
-    res.status(200).json("Successfully unfollowed");
-  } catch (err) {
-    next(err);
-  }
-};
-const follow = async (req, res, next) => {
-  try {
-    const following = await userModel.findById(req.params.id);
-    const follower = await userModel.findById(req.user.id);
-    if (!following) {
-      return next(errorHandler(404, "following user not found"));
-    }
-    if (!follower) {
-      return next(errorHandler(404, "follower user not found"));
-    }
-
-    if (!following.followers.includes(req.user.id)) {
-      following.followers = [...following.followers, req.user.id];
-    }
-    if (!follower.followings.includes(req.params.id)) {
-      follower.followings = [...follower.followings, req.params.id];
-    }
-    await follower.save();
-    await following.save();
-    res.status(200).json("Successfully followed");
+    res.status(200).json("Successfully updated follow status");
   } catch (err) {
     next(err);
   }
@@ -136,7 +131,6 @@ module.exports = {
   test,
   updateUser,
   getUser,
-  follow,
-  unfollow,
+  updateFollow,
   updateSaved,
 };

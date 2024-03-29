@@ -2,9 +2,8 @@ const {
   test,
   updateUser,
   getUser,
-  follow,
-  unfollow,
   updateSaved,
+  updateFollow,
 } = require("../controllers/user.controller");
 const verifyToken = require("../utils/verifyToken");
 
@@ -13,6 +12,5 @@ router.get("/test", test);
 router.put("/update", verifyToken, updateUser);
 router.get("/get", verifyToken, getUser);
 router.put("/updateSaved/:id", verifyToken, updateSaved); //id=post id
-router.put("/follow/:id", verifyToken, follow); //id=user id
-router.put("/unfollow/:id", verifyToken, unfollow); //id=user id
+router.put("/updateFollow/:id", verifyToken, updateFollow); //id=user id
 module.exports = router;
