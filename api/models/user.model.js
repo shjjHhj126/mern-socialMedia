@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       default: false,
-    },
+    }, //didn't use it
     city: {
       type: String,
       max: 50,

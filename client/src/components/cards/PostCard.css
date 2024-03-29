@@ -1,0 +1,19 @@
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-icon {
+  cursor: pointer;
+}
+
+.heart-icon:hover {
+  animation: bounce 0.3s linear;
+}

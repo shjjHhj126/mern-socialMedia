@@ -6,7 +6,10 @@ import "swiper/css/bundle";
 export default function ImageSwapper({ images }) {
   SwiperCore.use([Navigation]);
   return (
-    <Swiper navigation className="bg-blue-300 h-full w-full">
+    <Swiper
+      navigation
+      style={{ "--swiper-navigation-color": "rgb(209 213 219)" }}
+      className="bg-blue-300 h-full w-full">
       {images.map((image, index) => (
         <SwiperSlide key={image}>
           <div

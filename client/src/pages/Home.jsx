@@ -24,7 +24,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-1 justify-center bg-gradient-to-tr from-purple-200 to-pink-200">
+    <div className="flex flex-1 justify-center bg-gradient-to-tr from-purple-200 to-pink-200 max-w-screen-lg overflow-scroll ">
       <div className="flex w-2/3 ">
         {/*home container */}
         <div className="w-full bg-white  gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar">
@@ -37,7 +37,7 @@ export default function Home() {
             {loadingPosts && posts ? (
               <ReactLoading color="#000000" height={80} width={80} />
             ) : (
-              <ul className="bg-orange-200 flex-col w-full gap-5">
+              <ul className=" flex-col w-full gap-5 ">
                 {posts.map((post, index) => (
                   <li key={index}>
                     <PostCard post={post} />

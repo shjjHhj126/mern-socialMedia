@@ -34,6 +34,16 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+    toggleBookmark: (state, action) => {
+      const postId = action.payload;
+      const currentUser = state.currentUser;
+
+      if (currentUser.saved.includes(postId)) {
+        currentUser.saved = currentUser.saved.filter((id) => id !== postId);
+      } else {
+        currentUser.saved = [...currentUser.saved, postId];
+      }
+    },
   },
 });
 export const {
@@ -43,5 +53,6 @@ export const {
   logOutStart,
   logOutSuccess,
   logOutFailure,
+  toggleBookmark,
 } = userSlice.actions;
 export default userSlice.reducer;
