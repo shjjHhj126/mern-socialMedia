@@ -128,46 +128,6 @@ const getFollowingRecentPosts = async (req, res, next) => {
   }
 };
 
-// const updateLikes = async (req, res, next) => {
-//   try {
-//     const post = await postModel.findById(req.params.id);
-//     if (!post) {
-//       console.log("not found");
-//       return next(
-//         errorHandler(404, "Post not found, cannot update like status")
-//       );
-//     }
-
-//     const user = await userModel.findById(req.user.id);
-//     const alreadyLiked = post.likes.includes(req.user.id);
-//     console.log("currently ", alreadyLiked ? "like" : "unlike");
-
-//     if (req.body.like === alreadyLiked) {
-//       return res.status(400).json({ message: "Invalid like status" });
-//     }
-
-//     if (req.body.like && !alreadyLiked) {
-//       post.likes.push(req.user.id);
-//       user.likes.push(post._id);
-//     } else if (!req.body.like && alreadyLiked) {
-//       post.likes = post.likes.filter((id) => {
-//         id.toString() !== req.user.id;
-//         console.log(typeof id.toString(), typeof req.user.id);
-//       });
-//       user.likes = user.likes.filter((id) => id !== post._id);
-//     }
-//     console.log(post.likes.length);
-
-//     await post.save();
-//     await user.save();
-
-//     res.status(200).json({ message: "Likes updated successfully", post });
-//   } catch (error) {
-//     // Handle errors
-//     next(error);
-//   }
-// };
-
 const getSearchPosts = async (req, res, next) => {
   try {
     const searchTerm = req.query.searchTerm;

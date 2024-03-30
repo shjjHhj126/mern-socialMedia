@@ -53,7 +53,7 @@ export default function Leftbar() {
           <img
             src={currentUser.avatar}
             alt="profile"
-            className="h-14 w-14 rounded-ful"
+            className="h-14 w-14 rounded-full"
           />
           <div className="flex flex-col">
             <p className="text-[18px] font-bold leading-[140%]">

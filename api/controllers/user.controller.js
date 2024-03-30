@@ -31,14 +31,21 @@ const updateUser = async (req, res, next) => {
       },
       { new: true }
     );
-    res.status(200).json("User updated successfully");
+    await updatedUser.save();
+    res.status(200).json("user updated successfully");
   } catch (err) {
     next(err);
   }
 };
 const getUser = async (req, res, next) => {
   try {
-    const user = await userModel.findById(req.user.id);
+    const user = await userModel
+      .findById(req.user.id)
+      .populate("followers")
+      .populate("followings")
+      .populate("posts")
+      .populate("likes")
+      .populate("saved");
     if (!user) {
       next(errorHandler(404, "User not found"));
     }
@@ -49,7 +56,6 @@ const getUser = async (req, res, next) => {
 };
 const updateSaved = async (req, res, next) => {
   try {
-    console.log(req.params.id);
     const user = await userModel.findById(req.user.id);
     if (!user) {
       next(errorHandler(404, "User not found"));
@@ -82,21 +88,15 @@ const updateSaved = async (req, res, next) => {
 
 const updateFollow = async (req, res, next) => {
   try {
-    console.log(req.body);
-    console.log(req.user.id);
-    console.log(req.params.id);
     const following = await userModel.findById(req.params.id);
     if (!following) {
-      console.log("dfhd");
       return next(errorHandler(404, "following user not found"));
     }
     const follower = await userModel.findById(req.user.id);
     if (!follower) {
-      console.log("dfdsgefghd");
       return next(errorHandler(404, "follower user not found"));
     }
 
-    console.log(req.user.id, req.params.id);
     //follow
     if (
       req.body.follow &&
@@ -121,7 +121,7 @@ const updateFollow = async (req, res, next) => {
     }
     await follower.save();
     await following.save();
-    res.status(200).json("Successfully updated follow status");
+    res.status(200).json(following);
   } catch (err) {
     next(err);
   }
@@ -144,6 +144,58 @@ const getSavedPosts = async (req, res, next) => {
     next(err);
   }
 };
+const removeFollower = async (req, res, next) => {
+  try {
+    //user.followers remove req.params.id
+    const removeFollower = await userModel.findById(req.params.id);
+    if (!removeFollower) {
+      return next(errorHandler(404, "Follower not found"));
+    }
+    const user = await userModel.findById(req.user.id);
+    if (!user) {
+      return next(errorHandler(404, "Follower not found"));
+    }
+
+    if (user.followers.includes(removeFollower._id)) {
+      user.followers = user.followers.filter(
+        (user_i) => user_i._id.toString() !== removeFollower._id.toString()
+      );
+    }
+
+    if (removeFollower.followings.includes(user._id)) {
+      removeFollower.followings = removeFollower.followings.filter(
+        (user_i) => user_i._id.toString() !== user._id.toString()
+      );
+    }
+
+    await removeFollower.save();
+    await user.save();
+    res.status(200).json(removeFollower);
+  } catch (err) {
+    next(err);
+  }
+};
+const getnotFollowingUsers = async (req, res, next) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    const randomUsers = await userModel.aggregate([
+      {
+        $match: {
+          _id: { $nin: [...user.followings, ...user.followers, user._id] },
+        },
+      },
+      { $sample: { size: 10 } }, // Get a random sample of 10 users
+    ]);
+
+    res.status(200).json(randomUsers);
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = {
   test,
@@ -152,4 +204,6 @@ module.exports = {
   updateFollow,
   updateSaved,
   getSavedPosts,
+  removeFollower,
+  getnotFollowingUsers,
 };

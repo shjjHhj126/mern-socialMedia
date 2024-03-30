@@ -87,13 +87,14 @@ export default function PostCard({ post }) {
   };
   const handleBookmark = () => {
     setBookmarkState((prev) => !prev);
-    dispatch(toggleBookmark(post._id));
+
     mutationBookmark.mutate(!bookmarkState);
   };
   const handleFollow = () => {
     setFollowState(!followState);
-    dispatch(toggleFollow(post.creator));
+
     mutationFollow.mutate(!followState);
+    console.log(currentUser);
   };
 
   // Handle the mutation success
@@ -113,14 +114,14 @@ export default function PostCard({ post }) {
 
   useEffect(() => {
     if (mutationBookmark.isSuccess) {
-      console.log(mutationBookmark.data);
+      dispatch(toggleBookmark(post));
     }
     if (mutationBookmark.isError) {
       console.log(mutationBookmark.error);
     }
 
     console.log(mutationBookmark.status);
-  }, [mutationBookmark]);
+  }, [mutationBookmark.status]);
 
   // useEffect(() => {
   //   if (mutationComment.isSuccess) {
@@ -135,14 +136,14 @@ export default function PostCard({ post }) {
 
   useEffect(() => {
     if (mutationFollow.isSuccess) {
-      console.log(mutationFollow.data);
+      dispatch(toggleFollow(post.creator));
     }
     if (mutationFollow.isError) {
       console.log(mutationFollow.error);
     }
 
     console.log(mutationFollow.status);
-  }, [mutationFollow]);
+  }, [mutationFollow.status]);
 
   // const handleEmojiClick = (e, emojiObject) => {
   //   setComment(comment + emojiObject.emoji);

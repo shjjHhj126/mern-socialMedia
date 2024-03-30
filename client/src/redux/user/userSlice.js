@@ -10,6 +10,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    // setUser: (state, action) => {
+    //   state.currentUser = action.payload;
+    // },
     logInStart: (state) => {
       state.loading = true;
     },
@@ -17,6 +20,7 @@ const userSlice = createSlice({
       state.currentUser = action.payload;
       state.loading = false;
       state.error = null;
+      // console.log(state.currentUser);
     },
     logInFailure: (state, action) => {
       state.error = action.payload;
@@ -35,25 +39,38 @@ const userSlice = createSlice({
       state.loading = false;
     },
     toggleBookmark: (state, action) => {
-      const postId = action.payload;
+      const post = action.payload;
       const currentUser = state.currentUser;
 
-      if (currentUser.saved.includes(postId)) {
-        currentUser.saved = currentUser.saved.filter((id) => id !== postId);
-      } else {
-        currentUser.saved = [...currentUser.saved, postId];
-      }
-    },
-    toggleFollow: (state, action) => {
-      const userId = action.payload;
-      const currentUser = state.currentUser;
-
-      if (currentUser.followings.includes(userId)) {
-        currentUser.followings = currentUser.followings.filter(
-          (id) => id !== userId
+      if (currentUser.saved.some((saved_i) => saved_i.id === post._id)) {
+        currentUser.saved = currentUser.saved.filter(
+          (saved_i) => saved_i._id !== post._id
         );
       } else {
-        currentUser.followings = [...currentUser.followings, userId];
+        currentUser.saved = [...currentUser.saved, post];
+      }
+      // console.log("in userSlice", currentUser.saved);
+    },
+    toggleFollow: (state, action) => {
+      const user = action.payload;
+      const currentUser = state.currentUser;
+
+      if (currentUser.followings.some((user_i) => user_i._id === user._id)) {
+        currentUser.followings = currentUser.followings.filter(
+          (user_i) => user_i._id !== user._id
+        );
+      } else {
+        currentUser.followings = [...currentUser.followings, user];
+      }
+      // console.log("in userSlice toggleFollow", currentUser.followings);
+    },
+    toggleRemoveFollower: (state, action) => {
+      const user = action.payload;
+      const currentUser = state.currentUser;
+      if (currentUser.followers.some((user_i) => user_i._id === user._id)) {
+        currentUser.followers = currentUser.followers.filter(
+          (user_i) => user_i._id !== user._id
+        );
       }
     },
   },
@@ -67,5 +84,6 @@ export const {
   logOutFailure,
   toggleBookmark,
   toggleFollow,
+  toggleRemoveFollower,
 } = userSlice.actions;
 export default userSlice.reducer;

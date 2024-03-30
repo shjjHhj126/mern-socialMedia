@@ -11,11 +11,13 @@ import { TiSocialInstagram } from "react-icons/ti";
 
 export default function LogIn() {
   const [formData, setFormData] = useState({});
-  const { error, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
+    setLoading(false);
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -25,6 +27,7 @@ export default function LogIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       dispatch(logInStart());
       const res1 = await axios.post("/api/auth/login", formData, {
         headers: {
@@ -34,12 +37,18 @@ export default function LogIn() {
       const res = res1.data.data;
       if (res.success === false) {
         dispatch(logInFailure(res.message));
+        setLoading(false);
       }
-      // console.log(res);
-      dispatch(logInSuccess(res));
+
+      const res2 = await axios.get("api/user/get");
+      // console.log(res2.data);
+      dispatch(logInSuccess(res2.data));
+      setLoading(false);
       navigate("/");
     } catch (err) {
-      dispatch(logInFailure(err.response.data.message));
+      // dispatch(logInFailure());
+      setError(err);
+      setLoading(false);
     }
   };
 
@@ -87,7 +96,7 @@ export default function LogIn() {
               className="text-white bg-[#007FFF] font-semibold border-none h-[50px] rounded-lg p-2 hover:opacity-95 disabled:opacity-80">
               {loading ? "Loading..." : "Log In"}
             </button>
-            {error && <p className=" text-red-500 ">{error}</p>}
+            {/* {error && <p className=" text-red-500 ">{error}</p>} */}
             <hr className="border-1" />
             <div className="flex flex-row items-center justify-center gap-2">
               <p>Do not have an account?</p>
