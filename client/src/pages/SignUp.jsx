@@ -13,14 +13,23 @@ export default function SignUp() {
       [e.target.id]: e.target.value,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res1 = await axios.post("/api/auth/signup", formData, {
-        headers: {
-          "Content-Type": "application/json",
+      const res1 = await axios.post(
+        "/api/auth/signup",
+        {
+          ...formData,
+          username: formData.name + Math.random().toString(36).slice(-8),
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const res = res1.data;
       console.log(res);
       navigate("/log-in");
@@ -53,7 +62,7 @@ export default function SignUp() {
             className="bg-white flex flex-col justify-between h-[400px] p-5 rounded-lg">
             <input
               type="text"
-              id="username"
+              id="name"
               onChange={handleChange}
               className="h-[50px] rounded-lg border-2 font-normal border-gray-400 border-solid text-base p-5 focus:outline-none"
               placeholder="Username"

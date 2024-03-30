@@ -110,6 +110,24 @@ const getRecentPosts = async (req, res, next) => {
   }
 };
 
+const getFollowingRecentPosts = async (req, res, next) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    if (!user)
+      return next(errorHandler(404, "User not found, can not fetch data"));
+
+    const recentPosts = await postModel
+      .find({ creator: { $in: user.followings } }) // Find posts where the creator ID is in the 'following' array
+      .populate("creator")
+      .sort({ createdAt: "desc" })
+      .limit(20);
+
+    res.status(200).json(recentPosts);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // const updateLikes = async (req, res, next) => {
 //   try {
 //     const post = await postModel.findById(req.params.id);
@@ -150,11 +168,28 @@ const getRecentPosts = async (req, res, next) => {
 //   }
 // };
 
+const getSearchPosts = async (req, res, next) => {
+  try {
+    const searchTerm = req.query.searchTerm;
+    const posts = await postModel
+      .find({
+        caption: { $regex: searchTerm, $options: "i" },
+      })
+      .sort({ createdAt: "desc" })
+      .limit(20);
+
+    return res.status(200).json(posts);
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
   createPost,
   deletePost,
   getPost,
   updateLikes,
   getRecentPosts,
+  getFollowingRecentPosts,
+  getSearchPosts,
 };
 // .populate('userId');!!

@@ -66,14 +66,14 @@ const updateSaved = async (req, res, next) => {
     const updatedSaved = await userModel.findByIdAndUpdate(
       req.user.id,
       {
-        $set: {
-          saved: req.save
-            ? [...user.saved, req.user.id]
-            : user.saved.filter((id) => id.toString() !== req.params.id),
-        },
+        // Use $push to add a new post ID to the saved array or $pull to remove it
+        [req.body.save ? "$push" : "$pull"]: { saved: req.params.id },
       },
       { new: true }
     );
+
+    console.log(updatedSaved);
+    updatedSaved.save();
     res.status(200).json("bookmark updated successfully");
   } catch (err) {
     next(err);
@@ -126,6 +126,24 @@ const updateFollow = async (req, res, next) => {
     next(err);
   }
 };
+const getSavedPosts = async (req, res, next) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    if (!user)
+      return next(errorHandler(404, "User not found, can not fetch data"));
+
+    const savedPosts = await postModel
+      .find({ _id: { $in: user.saved } }) // Find posts where the creator ID is in the 'following' array
+      .populate("creator")
+      .sort({ createdAt: "desc" })
+      .limit(20);
+    console.log(savedPosts);
+
+    res.status(200).json(savedPosts);
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = {
   test,
@@ -133,4 +151,5 @@ module.exports = {
   getUser,
   updateFollow,
   updateSaved,
+  getSavedPosts,
 };

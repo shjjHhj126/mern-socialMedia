@@ -25,7 +25,7 @@ export default function PostCard({ post }) {
   const [likesLength, setLikesLength] = useState(post.likes.length);
   const [isMore, setIsMore] = useState(false);
   const [followState, setFollowState] = useState(
-    currentUser.followings.includes(post.creator)
+    currentUser.followings.some((user) => user._id === post.creator._id)
   );
   const [comment, setComment] = useState("");
   // const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -111,16 +111,16 @@ export default function PostCard({ post }) {
   //   console.log(mutationLike.status);
   // }, [mutationLike]);
 
-  // useEffect(() => {
-  //   if (mutationBookmark.isSuccess) {
-  //     console.log(mutationBookmark.data);
-  //   }
-  //   if (mutationBookmark.isError) {
-  //     console.log(mutationBookmark.error);
-  //   }
+  useEffect(() => {
+    if (mutationBookmark.isSuccess) {
+      console.log(mutationBookmark.data);
+    }
+    if (mutationBookmark.isError) {
+      console.log(mutationBookmark.error);
+    }
 
-  //   console.log(mutationBookmark.status);
-  // }, [mutationBookmark]);
+    console.log(mutationBookmark.status);
+  }, [mutationBookmark]);
 
   // useEffect(() => {
   //   if (mutationComment.isSuccess) {
@@ -238,18 +238,22 @@ export default function PostCard({ post }) {
           </div>
 
           {!isMore ? (
-            <p onClick={() => setIsMore(true)} className="text-gray-400">
+            <p
+              onClick={() => setIsMore(true)}
+              className="text-gray-400 cursor-pointer">
               more
             </p>
           ) : (
-            <p onClick={() => setIsMore(false)} className="text-gray-400">
+            <p
+              onClick={() => setIsMore(false)}
+              className="text-gray-400 cursor-pointer">
               show less
             </p>
           )}
         </div>
 
         {post.comments.length !== 0 && (
-          <p className="my-2">
+          <p className="my-2 cursor-pointer">
             view all {post.comments.length}{" "}
             {post.comments.length === 1 ? "comment" : "comments"}
           </p>

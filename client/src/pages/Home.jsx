@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     try {
       const fetchPosts = async () => {
-        const res = await axios.get("api/post/getRecentPosts");
+        const res = await axios.get("api/post/getFollowingRecentPosts");
         setPosts(res.data);
         setLoadingPosts(false);
       };
@@ -24,7 +24,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-1 justify-center bg-gradient-to-tr from-purple-200 to-pink-200 max-w-screen-lg overflow-scroll ">
+    <div className="flex flex-1 justify-center bg-gradient-to-tr from-purple-200 to-pink-200 max-w-screen-lg ">
       <div className="flex w-2/3 ">
         {/*home container */}
         <div className="w-full bg-white  gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar">

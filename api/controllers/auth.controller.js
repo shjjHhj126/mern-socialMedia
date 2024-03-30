@@ -4,11 +4,13 @@ const jwt = require("jsonwebtoken");
 const errorHandler = require("../utils/error");
 
 const signup = async (req, res, next) => {
-  const { username, email, password } = req.body;
+  console.log(req.body);
+  const { name, username, email, password } = req.body;
   try {
     //encrypt password
     const hashedPassword = bcrypt.hashSync(password, 10);
     const newUser = new userModel({
+      name,
       username,
       email,
       password: hashedPassword,
