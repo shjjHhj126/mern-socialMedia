@@ -29,11 +29,11 @@ const UserSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: "",
+      require: true,
     },
     coverPicture: {
       type: String,
-      default: "",
+      require: true,
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     followings: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
@@ -44,10 +44,17 @@ const UserSchema = new mongoose.Schema(
     city: {
       type: String,
       max: 50,
+      default: "",
     },
     from: {
       type: String,
       max: 50,
+      default: "",
+    },
+    bio: {
+      type: String,
+      max: 50,
+      default: "",
     },
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],

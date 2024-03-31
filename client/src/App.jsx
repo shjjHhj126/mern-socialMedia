@@ -8,7 +8,6 @@ import AllUsers from "./pages/AllUsers";
 import CreatePost from "./pages/CreatePost";
 import EditPost from "./pages/EditPost";
 import PostDetails from "./pages/PostDetails";
-import UpdateProfile from "./pages/UpdateProfile";
 import RootLayout from "./RootLayout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
@@ -39,7 +38,6 @@ export default function App() {
               <Route path="/edit-post/:id" element={<EditPost />} />
               <Route path="/posts/:id" element={<PostDetails />} />
               <Route path="/profile/:id/*" element={<Profile />} />
-              <Route path="/update-profile/:id" element={<UpdateProfile />} />
             </Route>
           </Routes>
         </BrowserRouter>

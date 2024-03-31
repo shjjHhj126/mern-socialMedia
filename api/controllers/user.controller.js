@@ -27,6 +27,7 @@ const updateUser = async (req, res, next) => {
           city: req.body.city,
           from: req.body.from,
           coverPicture: req.body.coverPicture,
+          bio: req.body.bio,
         },
       },
       { new: true }

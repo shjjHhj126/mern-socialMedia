@@ -16,6 +16,8 @@ const signup = async (req, res, next) => {
       password: hashedPassword,
       avatar:
         "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg",
+      coverPicture:
+        "https://firebasestorage.googleapis.com/v0/b/mern-socialmedia-b6969.appspot.com/o/picture-background-en3dnh2zi84sgt3t.jpg?alt=media&token=6636bd66-28df-43ad-b54e-3255536eb2a0",
     });
     await newUser.save();
     res.status(201).json("user created successfully!");
