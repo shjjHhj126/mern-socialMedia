@@ -19,6 +19,7 @@ import "../components/cards/PostCard.css";
 import { Menu, MenuItem, Button, Modal, Box } from "@mui/material";
 import EditPost from "./EditPost";
 import ReactLoading from "react-loading";
+import { Link } from "react-router-dom";
 
 const style = {
   position: "absolute",
@@ -247,14 +248,17 @@ function PostDetails({ the_post }) {
       <div className="w-full md:w-2/5 h-full flex flex-col px-2">
         {/*top */}
         <div className="flex p-1 md:p-2 items-center w-full">
-          <div className="flex flex-1 items-center gap-2">
+          <Link
+            className="flex flex-1 items-center gap-2"
+            to={`/profile/${creator._id}`}>
             <img
               className="h-7 w-7 md:h-10 md:w-10 rounded-full"
               src={creator.avatar}
               alt="avatar"
             />
             <p className="font-semibold ">{creator.name}</p>
-          </div>
+          </Link>
+
           <div>
             <Button
               id="basic-button"
@@ -349,11 +353,13 @@ function PostDetails({ the_post }) {
         <div className=" flex-1 overflow-y-auto border-y-2 overflow-scroll custom-scrollbar">
           <div className="flex flex-col ">
             <div className="flex flex-row p-2 gap-3 w-full ">
-              <img
-                src={creator.avatar || post.creator.avatar}
-                className="h-8 w-8 rounded-full"
-                alt="creator avatar"
-              />
+              <Link to={`/profile/${comment.author}`}>
+                <img
+                  src={creator.avatar || post.creator.avatar}
+                  className="h-8 w-8 rounded-full"
+                  alt="creator avatar"
+                />
+              </Link>
               <p
                 className=""
                 style={{
@@ -372,11 +378,13 @@ function PostDetails({ the_post }) {
                   <div
                     key={comment._id}
                     className="flex flex-row p-2 gap-3 w-full ">
-                    <img
-                      src={comment.authorAvatar}
-                      className="h-8 w-8 rounded-full"
-                      alt="author avatar"
-                    />
+                    <Link to={`/profile/${comment.author.toString()}`}>
+                      <img
+                        src={comment.authorAvatar}
+                        className="h-8 w-8 rounded-full"
+                        alt="author avatar"
+                      />
+                    </Link>
                     <p
                       className=" "
                       style={{

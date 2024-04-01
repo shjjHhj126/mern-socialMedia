@@ -10,6 +10,7 @@ import EditProfile from "../pages/EditProfile";
 import { Box, Modal } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import { toggleFollow } from "../redux/user/userSlice";
 
 const style = {
   position: "absolute",
@@ -44,8 +45,9 @@ const style = {
 
 function Profile() {
   const { currentUser } = useSelector((state) => state.user);
-  const { profileId } = useParams();
-  const { profileUser, setProfileUser } = useParams();
+  const { id } = useParams();
+  const profileId = id;
+  const [profileUser, setProfileUser] = useState({});
   const [joinTime, setJoinTime] = useState(
     new Date(currentUser.createdAt).toLocaleDateString("en-US")
   );
@@ -69,6 +71,7 @@ function Profile() {
         const res = await axios.get(`api/user/get/${profileId}`);
         setProfileUser(res.data);
         console.log(res.data);
+        console.log(res.data.followings.length);
       };
       getCurrentUser();
       getProfileUser();
@@ -113,10 +116,12 @@ function Profile() {
         <div className="flex flex-col m-2 sm:m-1 md:m-3 lg:m-5 relative bg-green-100">
           <img
             src={profileUser.coverPicture}
+            alt="cover picture"
             className="h-[200px] md:h-[150px] lg:h-[300px] w-full object-cover"
           />
           <img
             src={profileUser.avatar}
+            alt="avatar"
             className="h-[100px] w-[100px] md:h-[120px] md:w-[120px] lg:h-[180px] lg:w-[180px] rounded-full border-[6px] border-white absolute -bottom-[50px] md:-bottom-[60px] lg:-bottom-[90px] left-[50px] md:left-[60px] lg:left-[90px]"
           />
           {currentUser._id === profileId ? (
@@ -165,24 +170,30 @@ function Profile() {
           {joinTime}
         </div>
         <div className="flex gap-4">
-          <p>
-            <span className="font-bold">{profileUser.followings.length}</span>{" "}
-            Following
-          </p>
-          <p>
-            <span className="font-bold">{profileUser.followings.length}</span>
-            {profileUser.followings.length === 1 ? " Follower" : " Followers"}
-          </p>
+          {profileUser.followings && (
+            <p>
+              <span className="font-bold">{profileUser.followings.length}</span>{" "}
+              Following
+            </p>
+          )}
+          {profileUser.followers && (
+            <p>
+              <span className="font-bold">{profileUser.followers.length}</span>
+              {profileUser.followers.length === 1 ? " Follower" : " Followers"}
+            </p>
+          )}
         </div>
       </div>
 
       {/*bottom section*/}
       <div className="flex justify-center m-3 bg-green-100">
-        {loading && profileUser.posts.length === 0 ? (
-          <ReactLoading className="" color="#000000" height={80} width={80} />
-        ) : (
-          <ImagesGrid posts={profileUser.posts} />
-        )}
+        {loading &&
+          profileUser.posts &&
+          (profileUser.posts.length === 0 ? (
+            <ReactLoading className="" color="#000000" height={80} width={80} />
+          ) : (
+            <ImagesGrid posts={profileUser.posts} />
+          ))}
       </div>
     </div>
   );

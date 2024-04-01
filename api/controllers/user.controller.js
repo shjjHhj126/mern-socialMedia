@@ -44,7 +44,12 @@ const getUserById = async (req, res, next) => {
       .findById(req.params.id)
       .populate("followers")
       .populate("followings")
-      .populate("posts")
+      .populate({
+        path: "posts",
+        populate: {
+          path: "comments",
+        },
+      })
       .populate("likes")
       .populate("saved");
     if (!user) {
