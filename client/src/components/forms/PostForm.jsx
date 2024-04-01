@@ -299,14 +299,14 @@ export default function PostForm({ actionType, post }) {
           type="text"
           placeholder="Add Location..."
           value={formData.location}
-          className="border border-gray-300 border-w-2 p-3 w-full"></input>
+          className="border border-gray-300 border-w-2 p-3 w-full outline-none"></input>
         {/*Add Tags*/}
         <input
           id="tags"
           type="text"
           onChange={handleChange}
           placeholder="Add Tags (seperated by comma ',')..."
-          className="border border-gray-300 border-w-2 p-3 w-full"></input>
+          className="border border-gray-300 border-w-2 p-3 w-full outline-none"></input>
         {errorMsg && <p className="text-red-500">{errorMsg}</p>}
         <ToastContainer />
 

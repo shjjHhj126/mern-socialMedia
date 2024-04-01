@@ -17,7 +17,7 @@ const signup = async (req, res, next) => {
       avatar:
         "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg",
       coverPicture:
-        "https://firebasestorage.googleapis.com/v0/b/mern-socialmedia-b6969.appspot.com/o/picture-background-en3dnh2zi84sgt3t.jpg?alt=media&token=6636bd66-28df-43ad-b54e-3255536eb2a0",
+        "https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg?size=626&ext=jpg&ga=GA1.1.1687694167.1711972800&semt=sph",
     });
     await newUser.save();
     res.status(201).json("user created successfully!");
