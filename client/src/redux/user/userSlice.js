@@ -42,35 +42,44 @@ const userSlice = createSlice({
       const post = action.payload;
       const currentUser = state.currentUser;
 
-      if (currentUser.saved.some((saved_i) => saved_i.id === post._id)) {
-        currentUser.saved = currentUser.saved.filter(
-          (saved_i) => saved_i._id !== post._id
-        );
-      } else {
-        currentUser.saved = [...currentUser.saved, post];
-      }
-      // console.log("in userSlice", currentUser.saved);
-    },
-    toggleFollow: (state, action) => {
-      const user = action.payload;
-      const currentUser = state.currentUser;
+      const isAlreadySaved = currentUser.saved.some(
+        (savedPost) => savedPost.id === post._id
+      );
 
-      if (currentUser.followings.some((user_i) => user_i._id === user._id)) {
-        currentUser.followings = currentUser.followings.filter(
-          (user_i) => user_i._id !== user._id
+      if (isAlreadySaved) {
+        currentUser.saved = currentUser.saved.filter(
+          (savedPost) => savedPost.id !== post._id
         );
       } else {
-        currentUser.followings = [...currentUser.followings, user];
+        currentUser.saved.push(post);
       }
-      // console.log("in userSlice toggleFollow", currentUser.followings);
     },
     toggleRemoveFollower: (state, action) => {
       const user = action.payload;
       const currentUser = state.currentUser;
-      if (currentUser.followers.some((user_i) => user_i._id === user._id)) {
-        currentUser.followers = currentUser.followers.filter(
-          (user_i) => user_i._id !== user._id
+
+      // Remove the follower from the followers list
+      currentUser.followers = currentUser.followers.filter(
+        (follower) => follower._id !== user._id
+      );
+    },
+
+    toggleFollow: (state, action) => {
+      const user = action.payload;
+      const currentUser = state.currentUser;
+
+      // Check if the user is already followed
+      const isAlreadyFollowing = currentUser.followings.some(
+        (followingUser) => followingUser._id === user._id
+      );
+
+      // If already following, remove from the followings list, otherwise add
+      if (isAlreadyFollowing) {
+        currentUser.followings = currentUser.followings.filter(
+          (followingUser) => followingUser._id !== user._id
         );
+      } else {
+        currentUser.followings.push(user);
       }
     },
   },

@@ -1,5 +1,5 @@
 const postModel = require("../models/post.model");
-const mongoose = require("mongoose");
+const commentModel = require("../models/comment.model");
 const userModel = require("../models/user.model");
 const errorHandler = require("../utils/error");
 
@@ -18,13 +18,35 @@ const createPost = async (req, res, next) => {
     next(err);
   }
 };
+const updatePost = async (req, res, next) => {
+  try {
+    const post = await postModel.findById(req.params.id);
+    if (!post) {
+      return next(errorHandler(404, "Post not found, cannot update it"));
+    }
+    const updatedPost = await postModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    // console.log("in update post, req.body", req.body);
+    await updatedPost.save();
+
+    res.status(200).json("post updated successfully!");
+  } catch (err) {
+    next(err);
+  }
+};
 const deletePost = async (req, res, next) => {
+  console.log(req.params.id);
+
   const post = await postModel.findById(req.params.id);
   if (!post) {
-    return next(errorHandler(401, "Post not found"));
+    return next(errorHandler(404, "Post not found"));
   }
-  if (req.user.id !== post.creator) {
-    return next(errorHandler(401, "You can only delete your own post"));
+
+  if (req.user.id !== post.creator._id.toString()) {
+    return next(errorHandler(404, "You can only delete your own post"));
   }
 
   try {
@@ -47,7 +69,7 @@ const deletePost = async (req, res, next) => {
 
 const updateLikes = async (req, res, next) => {
   try {
-    console.log(req.params.id);
+    // console.log(req.params.id); // post id
     const post = await postModel.findById(req.params.id);
     if (!post) {
       return next(errorHandler(404, "Post not found"));
@@ -90,7 +112,10 @@ const getPost = async (req, res, next) => {
     return next(errorHandler(401, "You can only get your own post"));
   }
   try {
-    await postModel.findById(req.params.id);
+    await postModel
+      .findById(req.params.id)
+      .populate("creator")
+      .populate("comments");
     res.status(200).json(post);
   } catch (err) {
     next(err);
@@ -102,6 +127,7 @@ const getRecentPosts = async (req, res, next) => {
     const recentPosts = await postModel
       .find()
       .populate("creator")
+      .populate("comments")
       .sort({ createdAt: "desc" })
       .limit(20);
     res.status(200).json(recentPosts);
@@ -119,6 +145,7 @@ const getFollowingRecentPosts = async (req, res, next) => {
     const recentPosts = await postModel
       .find({ creator: { $in: user.followings } }) // Find posts where the creator ID is in the 'following' array
       .populate("creator")
+      .populate("comments")
       .sort({ createdAt: "desc" })
       .limit(20);
 
@@ -135,6 +162,8 @@ const getSearchPosts = async (req, res, next) => {
       .find({
         caption: { $regex: searchTerm, $options: "i" },
       })
+      .populate("creator")
+      .populate("comments")
       .sort({ createdAt: "desc" })
       .limit(20);
 
@@ -147,6 +176,7 @@ module.exports = {
   createPost,
   deletePost,
   getPost,
+  updatePost,
   updateLikes,
   getRecentPosts,
   getFollowingRecentPosts,

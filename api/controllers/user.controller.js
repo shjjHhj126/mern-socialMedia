@@ -38,13 +38,35 @@ const updateUser = async (req, res, next) => {
     next(err);
   }
 };
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await userModel
+      .findById(req.params.id)
+      .populate("followers")
+      .populate("followings")
+      .populate("posts")
+      .populate("likes")
+      .populate("saved");
+    if (!user) {
+      next(errorHandler(404, "User not found"));
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
 const getUser = async (req, res, next) => {
   try {
     const user = await userModel
       .findById(req.user.id)
       .populate("followers")
       .populate("followings")
-      .populate("posts")
+      .populate({
+        path: "posts",
+        populate: {
+          path: "comments",
+        },
+      })
       .populate("likes")
       .populate("saved");
     if (!user) {
@@ -66,7 +88,7 @@ const updateSaved = async (req, res, next) => {
       next(errorHandler(404, "Post not found"));
     }
 
-    if (req.body.save && post.likes.includes(req.params.id)) {
+    if (req.body.save && user.saved.includes(req.params.id)) {
       return next(errorHandler(400, "Bad request"));
     }
 
@@ -79,7 +101,6 @@ const updateSaved = async (req, res, next) => {
       { new: true }
     );
 
-    console.log(updatedSaved);
     updatedSaved.save();
     res.status(200).json("bookmark updated successfully");
   } catch (err) {
@@ -136,6 +157,7 @@ const getSavedPosts = async (req, res, next) => {
     const savedPosts = await postModel
       .find({ _id: { $in: user.saved } }) // Find posts where the creator ID is in the 'following' array
       .populate("creator")
+      .populate("comments")
       .sort({ createdAt: "desc" })
       .limit(20);
     console.log(savedPosts);
@@ -198,6 +220,41 @@ const getnotFollowingUsers = async (req, res, next) => {
   }
 };
 
+const updateLikes = async (req, res, next) => {
+  try {
+    // console.log(req.params.id); //post id
+    const post = await postModel.findById(req.params.id);
+    if (!post) {
+      return next(errorHandler(404, "Post not found"));
+    }
+
+    const user = await userModel.findById(req.user.id);
+    if (!user) {
+      return next(errorHandler(404, "You can only update your own post"));
+    }
+
+    if (req.body.like && user.likes.includes(req.params.id)) {
+      return next(errorHandler(400, "Bad request"));
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.user.id,
+      {
+        $set: {
+          likes: req.body.like
+            ? [...user.likes, req.params.id]
+            : user.likes.filter((id) => id.toString() !== req.params.id),
+        },
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ likesLength: updatedUser.likes.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   test,
   updateUser,
@@ -207,4 +264,6 @@ module.exports = {
   getSavedPosts,
   removeFollower,
   getnotFollowingUsers,
+  getUserById,
+  updateLikes,
 };

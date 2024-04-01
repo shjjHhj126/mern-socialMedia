@@ -3,6 +3,7 @@ import ReactLoading from "react-loading";
 import axios from "axios";
 import PostCard from "../components/cards/PostCard";
 import { IoHomeOutline } from "react-icons/io5";
+import { setUser } from "../redux/user/userSlice";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -16,8 +17,14 @@ export default function Home() {
         const res = await axios.get("api/post/getRecentPosts");
         setPosts(res.data);
         setLoadingPosts(false);
+        console.log("fetchRecentPosts", res.data);
+      };
+      const fetchUser = async () => {
+        const res = await axios.get("api/user/get");
+        setUser(res.data);
       };
       fetchPosts();
+      fetchUser();
     } catch (err) {
       setError("Error fetching posts. Please try again later.");
       setLoadingPosts(false);
@@ -41,7 +48,7 @@ export default function Home() {
               <ul className=" flex-col w-full gap-5 ">
                 {posts.map((post, index) => (
                   <li key={index}>
-                    <PostCard post={post} />
+                    <PostCard the_post={post} />
                   </li>
                 ))}
               </ul>

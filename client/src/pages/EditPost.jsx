@@ -1,5 +1,11 @@
-import React from "react";
+import { MdOutlinePostAdd } from "react-icons/md";
+import PostForm from "../components/forms/PostForm";
 
-export default function EditPost() {
-  return <div>EditPost</div>;
+function EditPost({ post }) {
+  return (
+    <div className="bg-black overflow-scroll custom-scrollbar h-full w-full ">
+      <PostForm actionType={"update"} post={post} />
+    </div>
+  );
 }
+export default EditPost;

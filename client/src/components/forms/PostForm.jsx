@@ -14,15 +14,21 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function PostForm() {
+export default function PostForm({ actionType, post }) {
   const [formData, setFormData] = useState({
-    caption: "",
-    location: "",
-    tags: [],
+    caption: post ? post.caption : "",
+    location: post ? post.location : "",
+    tags: post ? post.tags.join(",") : [],
   });
-  const [imgAndPurls, setImgAndPurls] = useState([]);
+  const [imgAndPurls, setImgAndPurls] = useState(
+    post
+      ? post.images.map((url) => ({
+          previewUrl: url,
+        }))
+      : []
+  ); //[{previewUrl:url}, {previewUrl:url}, {previewUrl:url}, ...]
   const [errorMsg, setErrorMsg] = useState("");
-  const [creating, setCreating] = useState(false);
+  const [submiting, setSubmiting] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
   const fileInput = useRef(null);
   const navigate = useNavigate();
@@ -35,24 +41,26 @@ export default function PostForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
-    setCreating(true);
+    setSubmiting(true);
     if (formData.caption === "") {
       setErrorMsg("caption required!");
-      setCreating(false);
+      setSubmiting(false);
       return;
     } else if (imgAndPurls.length === 0) {
       setErrorMsg("at least one image!");
-      setCreating(false);
+      setSubmiting(false);
       return;
     } else if (imgAndPurls.length > 6) {
       setErrorMsg("at most 6 images!");
-      setCreating(false);
+      setSubmiting(false);
       return;
     }
 
     try {
       const initialToastId = toast.info(
-        "Creating post...(it may last for a few seconds).",
+        actionType === "create"
+          ? "Creating post...(it may last for a few seconds)."
+          : "Updating post...(it may last for a few seconds).",
         {
           autoClose: false,
         }
@@ -63,38 +71,63 @@ export default function PostForm() {
 
       await handleImageUpload();
 
-      await axios.post(
-        "api/post/create",
-        {
-          ...formData,
-          images: downloadURLs,
-          creator: currentUser._id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setCreating(true);
+      actionType === "create"
+        ? await axios.post(
+            "api/post/create",
+            {
+              ...formData,
+              images: downloadURLs,
+              creator: currentUser._id,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        : await axios.put(
+            `api/post/update/${post._id}`,
+            {
+              ...formData,
+              images: downloadURLs,
+              creator: currentUser._id,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+      setSubmiting(false);
 
       toast.update(toastId, {
         onClose: () => navigate("/"),
-        render: "Images created successfully!",
+        render:
+          actionType === "create"
+            ? "Post created successfully!"
+            : "Post updated successfully!",
         type: "success",
         autoClose: 1000,
       });
+      // handleCloseModal();
     } catch (err) {
       console.log(err);
-      setErrorMsg("An error occurred during image upload.");
-      setCreating(false);
+      setErrorMsg("An error occurred during post upload.");
+      setSubmiting(false);
+      // handleCloseModal();
     }
   };
 
   const handleImageUpload = async () => {
     for (const imgFile of imgFiles) {
       try {
-        const downloadURL = await uploadImageFilePromise(imgFile);
+        let downloadURL = null;
+        if (typeof imgFile === "string") {
+          //EditPost already has downloadURL
+          downloadURL = imgFile;
+        } else {
+          downloadURL = await uploadImageFilePromise(imgFile);
+        }
         downloadURLs.push(downloadURL);
         // console.log("downloadURL", downloadURL);
       } catch (error) {
@@ -142,9 +175,10 @@ export default function PostForm() {
 
   const copyFilesFromImgAndPurls = () => {
     imgFiles = imgAndPurls.map((imgAndPurl) => {
-      // console.log(imgAndPurl.file);
-      return imgAndPurl.file;
+      if (imgAndPurl.file) return imgAndPurl.file;
+      else return imgAndPurl.previewUrl;
     });
+    //imgFiles has file OR previewUrl
   };
 
   const handleFiles = (files) => {
@@ -189,9 +223,9 @@ export default function PostForm() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row border-dashed border-[1px] border-orange-500 h-[1000px] rounded-lg">
+    <div className="flex flex-col md:flex-row border-dashed border-[1px] border-orange-500 h-full rounded-lg">
       {/*Leftpart : show images */}
-      <div className="flex-1 flex-wrap gap-2 md:w-1/2 min-h-[200px] w-full overflow-scroll custom-scrollbar md:rounded-tl-lg md:rounded-bl-lg bg-white">
+      <div className="flex-1 flex-wrap gap-2  md:w-1/2 min-h-[200px] w-full overflow-scroll custom-scrollbar rounded-tl-lg rounded-tr-lg md:rounded-bl-lg md:rounded-tr-none bg-white">
         {/*Leftpart : wrapper */}
         <div className="flex flex-wrap">
           {imgAndPurls.length > 0 &&
@@ -232,7 +266,7 @@ export default function PostForm() {
             onChange={handleChange}
             value={formData.caption}
             placeholder="Write a caption..."
-            className="border border-b-1 border-w-2 p-3 h-[120px] lg:rounded-tr-lg"></textarea>
+            className="border border-b-1 border-w-2 p-3 h-[120px] lg:rounded-tr-lg outline-none"></textarea>
         </div>
 
         {/*Images */}
@@ -278,20 +312,29 @@ export default function PostForm() {
 
         {/*buttons */}
         {/*flex-1 and h-full make sure the outer div take the remaining space,flex-col specifys the direction */}
-        <div className="flex-1  h-full flex flex-col justify-end">
+        <div className="flex-1 border-l-[1px] border-gray-300 h-full flex flex-col justify-end">
           {/*inner div make sure the buttons are flex-row */}
           <div className=" flex m-5">
+            {actionType === "create" && (
+              <button
+                className="transparent border border-solid rounded-s-md border-orange-500 text-orange-500 p-2 w-1/2 hover:opacity-95"
+                type="button"
+                onClick={() => navigate(-1)}>
+                Cancel
+              </button>
+            )}
             <button
-              className="transparent border border-solid rounded-s-md border-orange-500 text-orange-500 p-2 w-1/2 hover:opacity-95"
-              type="button"
-              onClick={() => navigate(-1)}>
-              Cancel
-            </button>
-            <button
-              disabled={errorMsg !== "" || creating === true}
-              className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-2 w-1/2 rounded-e-md hover:opacity-95 disabled:opacity-80"
+              disabled={errorMsg !== "" || submiting === true}
+              className={`bg-gradient-to-r from-orange-400 to-orange-500 text-white p-2 ${
+                actionType === "create"
+                  ? "w-1/2 rounded-e-md"
+                  : "w-full rounded-md"
+              }  hover:opacity-95 disabled:opacity-80`}
               onClick={handleSubmit}>
-              {creating === true ? "Creating..." : "Create Post"}
+              {actionType === "create" &&
+                (submiting === true ? "Creating..." : "Create Post")}
+              {actionType === "update" &&
+                (submiting === true ? "Updating..." : "Update Post")}
             </button>
           </div>
         </div>

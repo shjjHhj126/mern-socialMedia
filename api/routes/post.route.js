@@ -8,11 +8,13 @@ const {
   getRecentPosts,
   getFollowingRecentPosts,
   getSearchPosts,
+  updatePost,
 } = require("../controllers/post.controller");
 
 router.post("/create", verifyToken, createPost);
 router.delete("/delete/:id", verifyToken, deletePost);
 router.get("/get/:id", verifyToken, getPost);
+router.put("/update/:id", verifyToken, updatePost);
 router.put("/updateLikes/:id", verifyToken, updateLikes);
 router.get("/getRecentPosts", verifyToken, getRecentPosts);
 router.get("/getFollowingRecentPosts", verifyToken, getFollowingRecentPosts);

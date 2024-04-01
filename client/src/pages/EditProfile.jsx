@@ -196,7 +196,7 @@ export default function EditProfile({ currentUser }) {
         <label className="w-[80px] text-right font-bold text-normal ">
           Bio
         </label>
-        <input
+        <textarea
           value={formData.bio}
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
           className="flex-1 outline-none p-3 border-[2px] border-gray-100 rounded-lg"

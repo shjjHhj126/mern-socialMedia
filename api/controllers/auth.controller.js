@@ -49,6 +49,8 @@ const login = async (req, res, next) => {
         secure: process.env.NODE_ENV === "production",
       })
       .json({ status: 200, data: rest });
+
+    console.log(rest);
   } catch (err) {
     next(err);
   }

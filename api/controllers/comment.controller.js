@@ -5,7 +5,6 @@ const userModel = require("../models/user.model");
 const mongoose = require("mongoose");
 
 const createComment = async (req, res, next) => {
-  console.log(req.body);
   try {
     //make sure user id is correct
     const user = await userModel.findById(req.body.author);
@@ -26,7 +25,7 @@ const createComment = async (req, res, next) => {
     post.comments = [...post.comments, newComment._id]; //the wrong part
     await post.save();
 
-    res.status(200).json("successfully created a comment");
+    res.status(200).json(newComment);
   } catch (err) {
     next(err);
   }

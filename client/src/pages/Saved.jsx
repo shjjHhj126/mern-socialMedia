@@ -2,9 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ReactLoading from "react-loading";
 import ImagesGrid from "../components/ImageGrid";
-import { CiBookmark } from "react-icons/ci";
+import {
+  FaRegHeart,
+  FaHeart,
+  FaRegBookmark,
+  FaBookmark,
+  FaRegComment,
+} from "react-icons/fa";
 
-export default function Saved() {
+function Saved() {
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +33,7 @@ export default function Saved() {
     <div className="flex-1 w-full  max-w-screen-lg overflow-scroll custom-scrollbar border-l-2 border-gray-200">
       <div className="p-3">
         <div className="flex items-center gap-2 m-5">
-          <CiBookmark className="w-8 h-8" />
+          <FaRegBookmark className="w-8 h-8" />
           <h2 className="text-lg font-semibold md:font-bold">Saved</h2>
         </div>
         <div className="flex justify-center m-5">
@@ -44,3 +50,4 @@ export default function Saved() {
     </div>
   );
 }
+export default Saved;

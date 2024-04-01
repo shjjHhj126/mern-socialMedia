@@ -1,11 +1,13 @@
 import React from "react";
 import Topbar from "./components/Topbar";
 import Leftbar from "./components/Leftbar";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Bottombar from "./components/Bottombar";
+import { useSelector } from "react-redux";
 
 export default function RootLayout() {
-  return (
+  const { currentUser } = useSelector((state) => state.user);
+  return currentUser ? (
     <div className="w-full md:flex ">
       <Topbar />
       <Leftbar />
@@ -16,5 +18,7 @@ export default function RootLayout() {
 
       <Bottombar />
     </div>
+  ) : (
+    <Navigate to="/log-in" />
   );
 }

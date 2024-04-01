@@ -11,7 +11,7 @@ export default function CreatePost() {
           Create Post
         </h2>
       </div>
-      <PostForm />
+      <PostForm actionType={"create"} post={null} />
     </div>
     // </div>
   );

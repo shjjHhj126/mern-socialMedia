@@ -9,7 +9,7 @@ import {
 } from "../redux/user/userSlice";
 import { TiSocialInstagram } from "react-icons/ti";
 
-export default function LogIn() {
+function LogIn() {
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ export default function LogIn() {
       if (res.success === false) {
         dispatch(logInFailure(res.message));
         setLoading(false);
+        return;
       }
 
       const res2 = await axios.get("api/user/get");
@@ -46,8 +47,9 @@ export default function LogIn() {
       setLoading(false);
       navigate("/");
     } catch (err) {
-      // dispatch(logInFailure());
-      setError(err);
+      console.log(err);
+      dispatch(logInFailure(err.response.data.message));
+      setError(err.response.data.message);
       setLoading(false);
     }
   };
@@ -106,9 +108,11 @@ export default function LogIn() {
                 <span> Signup </span>
               </Link>
             </div>
+            {error && <p className="text-red-500 text-normal">{error}</p>}
           </form>
         </div>
       </div>
     </div>
   );
 }
+export default LogIn;

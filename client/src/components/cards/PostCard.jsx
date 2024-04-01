@@ -1,26 +1,48 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ImageSwapper from "../ImageSwapper";
-import { FaRegHeart, FaHeart } from "react-icons/fa";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
-import { FaRegComment } from "react-icons/fa";
+import {
+  FaRegHeart,
+  FaHeart,
+  FaRegBookmark,
+  FaBookmark,
+  FaRegComment,
+} from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleBookmark, toggleFollow } from "../../redux/user/userSlice";
 import axios from "axios";
 import "./PostCard.css";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { Box, Modal } from "@mui/material";
+import PostDetails from "../../pages/PostDetails";
 // import EmojiPicker from "emoji-picker-react";
 // import { BsEmojiSmile } from "react-icons/bs";
 
-export default function PostCard({ post }) {
+const style = {
+  position: "absolute",
+  top: "50%", //position
+  left: "50%", //position
+  transform: "translate(-50%, -50%)", //center
+  width: "80%",
+  maxWidth: 800,
+  height: 500,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 2,
+  borderRadius: "12px",
+  // overflow: "auto", // Enable scrolling
+};
+
+function PostCard({ the_post }) {
+  const [post, setPost] = useState(the_post);
   const [user, setUser] = useState({});
   const { currentUser } = useSelector((state) => state.user);
   const [likeState, setLikeState] = useState(
     post.likes.includes(currentUser._id)
   );
   const [bookmarkState, setBookmarkState] = useState(
-    currentUser.saved.includes(post._id)
+    currentUser.saved.some((postObj) => postObj._id === post._id)
   );
   const [likesLength, setLikesLength] = useState(post.likes.length);
   const [isMore, setIsMore] = useState(false);
@@ -28,11 +50,13 @@ export default function PostCard({ post }) {
     currentUser.followings.some((user) => user._id === post.creator._id)
   );
   const [comment, setComment] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [open, setOpen] = useState(false);
   // const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const mutationLike = useMutation({
+  const mutationLikePost = useMutation({
     mutationFn: (newLike) => {
       return axios.put(
         `/api/post/updateLikes/${post._id}`,
@@ -44,9 +68,20 @@ export default function PostCard({ post }) {
     },
   });
 
+  const mutationLikeUser = useMutation({
+    mutationFn: (newLike) => {
+      return axios.put(
+        `/api/user/updateLikes/${post._id}`,
+        { like: newLike },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    },
+  });
+
   const mutationBookmark = useMutation({
     mutationFn: (newBookmark) => {
-      console.log(post._id);
       return axios.put(
         `/api/user/updateSaved/${post._id}`,
         { save: newBookmark },
@@ -61,7 +96,13 @@ export default function PostCard({ post }) {
     mutationFn: (content) => {
       return axios.post(
         "/api/comment/create",
-        { author: currentUser._id, post: post._id, content: content },
+        {
+          author: currentUser._id,
+          post: post._id,
+          content: content,
+          authorAvatar: currentUser.avatar,
+          authorName: currentUser.name,
+        },
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -83,7 +124,8 @@ export default function PostCard({ post }) {
     setLikeState((prev) => !prev);
 
     // add the updated Post into the queue in mutation
-    mutationLike.mutate(!likeState); //because setLikeState() take a while, so should be !likeState
+    mutationLikePost.mutate(!likeState); //because setLikeState() take a while, so should be !likeState
+    mutationLikeUser.mutate(!likeState);
   };
   const handleBookmark = () => {
     setBookmarkState((prev) => !prev);
@@ -94,23 +136,34 @@ export default function PostCard({ post }) {
     setFollowState(!followState);
 
     mutationFollow.mutate(!followState);
-    console.log(currentUser);
+    // console.log(currentUser);
   };
 
-  // Handle the mutation success
-  // useEffect(() => {
-  //   if (mutationLike.isSuccess) {
-  //     console.log(mutationLike.data);
-  //   }
-  //   if (mutationLike.isError) {
-  //     console.log(mutationLike.error);
-  //   }
-  //   if (mutationLike.data) {
-  //     setLikesLength(mutationLike.data.data.likesLength);
-  //   }
+  //Handle the mutation success
+  useEffect(() => {
+    if (mutationLikePost.isSuccess) {
+      console.log(mutationLikePost.data);
+    }
+    if (mutationLikePost.isError) {
+      console.log(mutationLikePost.error);
+    }
+    if (mutationLikePost.data) {
+      setLikesLength(mutationLikePost.data.data.likesLength);
+    }
 
-  //   console.log(mutationLike.status);
-  // }, [mutationLike]);
+    console.log(mutationLikePost.status);
+  }, [mutationLikePost.status]);
+
+  useEffect(() => {
+    if (mutationLikeUser.isSuccess) {
+      console.log(mutationLikeUser.data);
+    }
+    if (mutationLikeUser.isError) {
+      console.log(mutationLikeUser.error);
+    }
+
+    console.log(mutationLikeUser.status);
+  }, [mutationLikeUser.status]);
 
   useEffect(() => {
     if (mutationBookmark.isSuccess) {
@@ -122,17 +175,6 @@ export default function PostCard({ post }) {
 
     console.log(mutationBookmark.status);
   }, [mutationBookmark.status]);
-
-  // useEffect(() => {
-  //   if (mutationComment.isSuccess) {
-  //     console.log(mutationComment.data);
-  //   }
-  //   if (mutationComment.isError) {
-  //     console.log(mutationComment.error);
-  //   }
-
-  //   console.log(mutationComment.status);
-  // }, [mutationComment]);
 
   useEffect(() => {
     if (mutationFollow.isSuccess) {
@@ -149,15 +191,31 @@ export default function PostCard({ post }) {
   //   setComment(comment + emojiObject.emoji);
   // };
 
-  const handleComment = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault(); // Prevent the default behavior of the Enter key
-      if (comment.trim() !== "") {
-        mutationComment.mutate(comment); // Call the mutation to submit the comment
-        post.comments = [...post.comments, comment];
-      }
-      setComment("");
+  const handleComment = () => {
+    if (comment.trim() !== "" && !isSubmittingComment) {
+      setIsSubmittingComment(true);
+      mutationComment.mutate(comment);
     }
+  };
+
+  useEffect(() => {
+    if (mutationComment.isSuccess || mutationComment.isError) {
+      setIsSubmittingComment(false); // Reset submitting state
+      if (mutationComment.isSuccess) {
+        setComment(""); // Reset comment field on success
+        setPost({
+          ...post,
+          comments: [...post.comments, mutationComment.data.data],
+        });
+      }
+    }
+  }, [mutationComment.status]);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -254,12 +312,21 @@ export default function PostCard({ post }) {
         </div>
 
         {post.comments.length !== 0 && (
-          <p className="my-2 cursor-pointer">
+          <p onClick={handleOpen} className="my-2 text-gray-400 cursor-pointer">
             view all {post.comments.length}{" "}
             {post.comments.length === 1 ? "comment" : "comments"}
           </p>
         )}
-        <div className="flex items-stretch">
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="parent-modal-title"
+          aria-describedby="parent-modal-description">
+          <Box sx={style}>
+            <PostDetails the_post={post} />
+          </Box>
+        </Modal>
+        <div className="flex  items-center">
           <input
             type="text"
             placeholder="Add a comment..."
@@ -267,12 +334,21 @@ export default function PostCard({ post }) {
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            onKeyDown={handleComment}
           />
           {/*emoji picker */}
+          <p
+            onClick={handleComment}
+            disabled={isSubmittingComment}
+            className={`${
+              comment === "" ? "text-blue-200" : "text-blue-500"
+            } mr-5 font-semibold cursor-pointer`}>
+            Post
+          </p>
         </div>
       </div>
     </div>
   );
 }
 //always forget:onChange={(e) => setComment(e.target.value), to show what u type in the <input>
+
+export default PostCard;

@@ -1,30 +1,57 @@
-import { Grid } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
+import { Box, Grid, Modal } from "@mui/material";
+import PostDetails from "../pages/PostDetails";
+import { useState } from "react";
 
-const Item = styled(Paper)(({ theme }) => ({}));
+const style = {
+  position: "absolute",
+  top: "50%", //position
+  left: "50%", //position
+  transform: "translate(-50%, -50%)", //center
+  width: "80%",
+  maxWidth: 800,
+  height: 500,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 2,
+  borderRadius: "12px",
+  // overflow: "auto", // Enable scrolling
+};
 
 const ImagesGrid = ({ posts }) => {
-  const images = posts.map((post) => post.images[0]);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
-        {images.map((url, index) => (
+        {posts.map((post, index) => (
           <Grid item lg={4} md={3} xs={4} key={index}>
-            <Item>
-              <img
-                className="object-cover w-full h-full"
-                src={url}
-                alt={`Image ${index}`}
-                style={{
-                  aspectRatio: "1 / 1",
-                  maxHeight: "100%",
-                  maxWidth: "100%",
-                }}
-              />
-            </Item>
+            <img
+              onClick={handleOpen}
+              className="object-cover w-full h-full"
+              src={post.images[0]}
+              alt={`Image ${index}`}
+              style={{
+                aspectRatio: "1 / 1",
+                maxHeight: "100%",
+                maxWidth: "100%",
+              }}
+            />
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="parent-modal-title"
+              aria-describedby="parent-modal-description">
+              <Box sx={style}>
+                <PostDetails the_post={post} />
+              </Box>
+            </Modal>
           </Grid>
         ))}
       </Grid>

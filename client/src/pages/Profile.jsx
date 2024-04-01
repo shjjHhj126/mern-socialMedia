@@ -7,7 +7,7 @@ import { setUser } from "../redux/user/userSlice";
 import { SlCalender } from "react-icons/sl";
 import EditProfile from "../pages/EditProfile";
 
-import { TextField, Button, Box, Modal, Typography } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 
 const style = {
   position: "absolute",
@@ -22,24 +22,25 @@ const style = {
   p: 4,
   borderRadius: "12px",
   overflow: "auto", // Enable scrolling
+
   "&::-webkit-scrollbar": {
-    width: "2px",
-    height: "2px",
-    borderRadius: "10px",
+    width: "0px",
+    height: "0px",
+    borderRadius: "0px",
   },
   "&::-webkit-scrollbar-track": {
-    background: "lightsalmon",
+    background: "white",
   },
   "&::-webkit-scrollbar-thumb": {
-    background: "orange",
-    borderRadius: "50px",
+    background: "white",
+    borderRadius: "30px",
   },
   "&::-webkit-scrollbar-thumb:hover": {
     background: "white",
   },
 };
 
-export default function Profile() {
+function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const [joinTime, setJoinTime] = useState(
     new Date(currentUser.createdAt).toLocaleDateString("en-US")
@@ -103,7 +104,7 @@ export default function Profile() {
             @${currentUser.username}
           </h2>
         </div>
-        {currentUser.bio !== "" && <p className="my-7">{currentUser.bio}</p>}
+        {currentUser.bio !== "" && <p className="my-3">{currentUser.bio}</p>}
         <div className="flex gap-2 items-center">
           <SlCalender />
           {joinTime}
@@ -131,3 +132,5 @@ export default function Profile() {
     </div>
   );
 }
+
+export default Profile;
