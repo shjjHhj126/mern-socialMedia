@@ -21,10 +21,10 @@ export default function EditProfile({ currentUser }) {
     email: currentUser.email,
     from: currentUser.from,
     city: currentUser.city,
-    password: currentUser.password,
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [coverPicFile, setCoverPicFile] = useState(null);
+  const [password, setPassword] = useState(""); //seperate the password cuz its sensitive data
   const [errorMsg, setErrorMsg] = useState("");
   const [creating, setCreating] = useState(false);
   const avatarInput = useRef(null);
@@ -72,6 +72,7 @@ export default function EditProfile({ currentUser }) {
           coverPicture: coverPicDownloadURL
             ? coverPicDownloadURL
             : formData.coverPicture,
+          password: password !== "" ? password : currentUser.password,
         },
         {
           headers: {
@@ -79,9 +80,17 @@ export default function EditProfile({ currentUser }) {
           },
         }
       );
-      console.log(res.data);
       setCreating(false);
-      dispatch(setUser(formData));
+      dispatch(
+        setUser({
+          ...formData,
+          avatar: avatarDownloadURL ? avatarDownloadURL : formData.avatar,
+          coverPicture: coverPicDownloadURL
+            ? coverPicDownloadURL
+            : formData.coverPicture,
+          password: password !== "" ? password : currentUser.password,
+        })
+      );
 
       // toast.update(toastId, {
       //   render: "Profile updated successfully!",
@@ -241,9 +250,7 @@ export default function EditProfile({ currentUser }) {
           Password
         </label>
         <input
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
-          }
+          onChange={(e) => setPassword(e.target.value)}
           className="flex-1 outline-none p-3 border-[2px] border-gray-100 rounded-lg"
         />
       </div>
