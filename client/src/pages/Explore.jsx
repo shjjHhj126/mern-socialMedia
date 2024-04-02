@@ -92,17 +92,16 @@ export default function Explore() {
           </div>
         </div>
         <div className="flex justify-center m-3">
-          {loadingPosts && posts ? (
+          {loadingPosts ? (
             <ReactLoading className="" color="#000000" height={80} width={80} />
+          ) : posts.length === 0 ? (
+            <p className="w-full text-center text-xl m-5">
+              No searching result
+            </p>
           ) : (
             <ImagesGrid posts={posts} />
           )}
           {error && <p>{error}</p>}
-          {posts.length === 0 && (
-            <p className="w-full text-center text-xl m-5">
-              No searching result
-            </p>
-          )}
         </div>
       </div>
     </div>
