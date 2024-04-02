@@ -370,6 +370,12 @@ function PostDetails({ the_post }) {
                 </span>
                 {post.caption}
               </p>
+              <div>
+                {post.tags.length > 0 &&
+                  post.tags.map((tag, index) => (
+                    <span key={index}>#{tag} </span>
+                  ))}
+              </div>
             </div>
             {post.comments &&
               post.comments.map((comment) => {
