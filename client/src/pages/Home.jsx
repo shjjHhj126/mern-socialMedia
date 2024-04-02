@@ -13,8 +13,8 @@ export default function Home() {
   useEffect(() => {
     try {
       const fetchPosts = async () => {
-        // const res = await axios.get("api/post/getFollowingRecentPosts");
-        const res = await axios.get("api/post/getRecentPosts");
+        const res = await axios.get("api/post/getFollowingRecentPosts");
+        // const res = await axios.get("api/post/getRecentPosts");
         setPosts(res.data);
         setLoadingPosts(false);
         console.log("fetchRecentPosts", res.data);

@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://mern-socialmedia-dxas.onrender.com",
+    origin: "https://mern-socialmedia-dxas.onrender.com", //frontend url
     credentials: true,
   })
 );
