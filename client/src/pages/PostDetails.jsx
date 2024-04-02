@@ -351,7 +351,7 @@ function PostDetails({ the_post }) {
         {/*middle */}
         <div className=" flex-1 overflow-y-auto border-y-2 overflow-scroll custom-scrollbar">
           <div className="flex flex-col ">
-            <div className="flex flex-row p-2 gap-3 w-full ">
+            <div className="flex p-2 gap-3 w-full ">
               <Link to={`/profile/${comment.author}`}>
                 <img
                   src={creator.avatar || post.creator.avatar}
@@ -370,12 +370,10 @@ function PostDetails({ the_post }) {
                 </span>
                 {post.caption}
               </p>
-              <div>
-                {post.tags.length > 0 &&
-                  post.tags.map((tag, index) => (
-                    <span key={index}>#{tag} </span>
-                  ))}
-              </div>
+            </div>
+            <div>
+              {post.tags.length > 0 &&
+                post.tags.map((tag, index) => <span key={index}>#{tag} </span>)}
             </div>
             {post.comments &&
               post.comments.map((comment) => {
