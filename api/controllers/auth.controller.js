@@ -1,11 +1,15 @@
 const bcrypt = require("bcryptjs");
 const userModel = require("../models/user.model");
+const postModel = require("../models/post.model");
+const commentModel = require("../models/comment.model");
 const jwt = require("jsonwebtoken");
 const errorHandler = require("../utils/error");
 
 const signup = async (req, res, next) => {
   console.log(req.body);
   const { name, username, email, password } = req.body;
+  const user = await userModel.findOne({ email });
+  if (user) return next(errorHandler(500, "Already have an account"));
   try {
     //encrypt password
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -67,42 +71,60 @@ const logout = (req, res, next) => {
 //haven't try this on postman
 const deleteAccount = async (req, res, next) => {
   try {
+    const userId = req.params.id;
+
     // Find the user to be deleted
-    const user = await userModel.findById(req.params.id);
+    const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Remove user from the 'likes' array in all posts
+    // Find posts and comments authored by the user
+    const userPosts = await postModel.find({ creator: userId });
+    const userComments = await commentModel.find({ author: userId });
+
+    // Remove user's posts from other users' likes and saved arrays
+    const postIdsToDelete = userPosts.map((post) => post._id);
+    await userModel.updateMany(
+      {
+        $or: [
+          { likes: { $in: postIdsToDelete } },
+          { saved: { $in: postIdsToDelete } },
+        ],
+      },
+      {
+        $pull: {
+          likes: { $in: postIdsToDelete },
+          saved: { $in: postIdsToDelete },
+        },
+      }
+    );
+
+    // Remove the user from the 'followers', 'followings' array in other user documents
+    await userModel.updateMany(
+      { $or: [{ followers: userId }, { followings: userId }] },
+      { $pull: { followers: userId, followings: userId } }
+    );
+
+    // Remove user from the 'likes', 'comments' array in all posts
     await postModel.updateMany(
-      { likes: user._id },
-      { $pull: { likes: user._id } }
+      { $or: [{ likes: userId }, { comments: userId }] },
+      { $pull: { likes: userId, comments: userId } }
     );
 
     // Delete comments authored by the user
-    await commentModel.deleteMany({ author: user._id });
+    await commentModel.deleteMany({ author: userId });
 
-    // Remove user's comments from the 'comments' array in all posts
-    await postModel.updateMany(
-      { comments: user._id },
-      { $pull: { comments: user._id } }
-    );
-
-    // Remove the user from the 'followers' array in other user documents
-    await userModel.updateMany(
-      { followers: user._id },
-      { $pull: { followers: user._id } }
-    );
-
-    // Remove the user from the 'followings' array in other user documents
-    await userModel.updateMany(
-      { followings: user._id },
-      { $pull: { followings: user._id } }
-    );
+    // Delete posts created by the user
+    await postModel.deleteMany({ creator: userId });
 
     // Delete the user account
-    await userModel.findByIdAndDelete(req.params.id);
+    await userModel.findByIdAndDelete(userId);
 
+    //no need to save() back the DB
+
+    // Response
+    res.clearCookie("access_token");
     res.status(200).json({ message: "Account successfully deleted" });
   } catch (err) {
     next(err);

@@ -54,12 +54,14 @@ function PostDetails({ the_post }) {
   );
   const [comment, setComment] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null); //for menu
+  const [anchorEl, setAnchorEl] = useState(null); //for menu
   const [openEditPost, setOpenEditPost] = useState(false);
   const [deletingPost, setDeletingPost] = useState(false);
   const openMenu = Boolean(anchorEl);
   SwiperCore.use([Navigation]);
   const dispatch = useDispatch();
+  console.log("openEditPost", openEditPost);
+  console.log("openMenu", openMenu);
 
   useEffect(() => {
     const fetchCreator = async () => {
@@ -127,6 +129,7 @@ function PostDetails({ the_post }) {
       );
     },
   });
+
   const mutationFollow = useMutation({
     mutationFn: (fo) => {
       return axios.put(
@@ -315,7 +318,6 @@ function PostDetails({ the_post }) {
                   onClick={() => {
                     handleMenuClose();
                     setOpenEditPost(true);
-                    console.log("click Edit Post");
                   }}>
                   Edit Post
                 </MenuItem>

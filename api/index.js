@@ -3,11 +3,15 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+import path from "path";
 const userRoute = require("./routes/user.route");
 const authRoute = require("./routes/auth.route");
 const postRoute = require("./routes/post.route");
 const commentRoute = require("./routes/comment.route");
 dotenv.config();
+
+//create a dynamic path
+const __dirname = path.resolve();
 
 // connet to database
 mongoose
@@ -32,7 +36,7 @@ app.use(
 );
 
 // listen to a port
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("server is running!");
 });
 
@@ -42,6 +46,13 @@ app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute);
+
+//create static path
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/dist/index.html"));
+});
 
 //error handling middleware
 app.use((err, req, res, next) => {

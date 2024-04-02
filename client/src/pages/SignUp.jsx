@@ -6,8 +6,11 @@ import { TiSocialInstagram } from "react-icons/ti";
 export default function SignUp() {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    setLoading(false);
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -16,7 +19,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const res1 = await axios.post(
         "/api/auth/signup",
@@ -31,10 +34,11 @@ export default function SignUp() {
         }
       );
       const res = res1.data;
-      console.log(res);
+      setLoading(false);
       navigate("/log-in");
     } catch (err) {
-      console.log(err);
+      setError(err.response.data.message);
+      setLoading(false);
     }
   };
 
@@ -85,8 +89,10 @@ export default function SignUp() {
               minLength="6"
               required
             />
-            <button className="text-white bg-blue-500 font-semibold border-none h-[50px] rounded-lg p-2">
-              Sign Up
+            <button
+              disabled={loading}
+              className="text-white bg-blue-500 font-semibold border-none h-[50px] rounded-lg p-2">
+              {loading ? "Loading..." : "Sign Up"}
             </button>
             <hr className="border-1" />
             <div className="flex flex-row items-center justify-center gap-5">
@@ -97,6 +103,7 @@ export default function SignUp() {
                 <span> Login </span>
               </Link>
             </div>
+            {error && <p className="text-red-500 text-normal">{error}</p>}
           </form>
         </div>
       </div>
