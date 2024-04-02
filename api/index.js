@@ -9,6 +9,7 @@ const authRoute = require("./routes/auth.route");
 const postRoute = require("./routes/post.route");
 const commentRoute = require("./routes/comment.route");
 dotenv.config({ path: "config.env" });
+// dotenv.config();
 
 //create a dynamic path : __dirname
 const cur_dir = path.resolve();
@@ -30,7 +31,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://mern-socialmedia-dxas.onrender.com", //frontend url
+    origin: "https://mern-socialmedia-dxas.onrender.com",
+    // "http://localhost:5173", //frontend url
     credentials: true,
   })
 );

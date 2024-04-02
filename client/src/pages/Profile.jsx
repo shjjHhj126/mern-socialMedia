@@ -44,7 +44,7 @@ const style = {
 };
 
 function Profile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user); //automatically rerender if currentUser changed
   const { id } = useParams();
   const profileId = id;
   const [profileUser, setProfileUser] = useState({});
@@ -53,9 +53,7 @@ function Profile() {
   );
   const [loading, setLoading] = useState(false);
   const [openEditProfile, setOpenEditProfile] = useState(false);
-  const [followState, setFollowState] = useState(
-    currentUser.followings.some((user) => user._id === profileId)
-  );
+  const [followState, setFollowState] = useState(false);
   const dispatch = useDispatch();
 
   const handleEditProfile = () => setOpenEditProfile(true);
@@ -63,6 +61,7 @@ function Profile() {
 
   useEffect(() => {
     try {
+      setLoading(true);
       const getCurrentUser = async () => {
         const res = await axios.get("api/user/get");
         dispatch(setUser(res.data));
@@ -75,10 +74,17 @@ function Profile() {
       };
       getCurrentUser();
       getProfileUser();
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
   }, []);
+
+  useEffect(() => {
+    setFollowState(
+      currentUser.followings.some((user) => user._id === profileId)
+    );
+  }, [currentUser]);
 
   const mutationFollow = useMutation({
     mutationFn: (fo) => {
@@ -122,7 +128,7 @@ function Profile() {
           <img
             src={profileUser.avatar}
             alt="avatar"
-            className="h-[100px] w-[100px] md:h-[120px] md:w-[120px] lg:h-[180px] lg:w-[180px] rounded-full border-[6px] border-white absolute -bottom-[50px] md:-bottom-[60px] lg:-bottom-[90px] left-[50px] md:left-[60px] lg:left-[90px]"
+            className="h-[100px] w-[100px] md:h-[120px] md:w-[120px] lg:h-[180px] lg:w-[180px] rounded-full border-[6px] border-white absolute -bottom-[50px] md:-bottom-[60px] lg:-bottom-[90px] left-[50px] md:left-[60px] lg:left-[90px] object-cover"
           />
           {currentUser._id === profileId ? (
             <button
@@ -186,14 +192,16 @@ function Profile() {
       </div>
 
       {/*bottom section*/}
-      <div className="flex justify-center m-3 bg-green-100">
-        {loading &&
-          profileUser.posts &&
-          (profileUser.posts.length === 0 ? (
-            <ReactLoading className="" color="#000000" height={80} width={80} />
+      <div className="flex justify-center m-3 ">
+        {!loading && profileUser.posts ? (
+          profileUser.posts.length === 0 ? (
+            <p>No posts found.</p>
           ) : (
             <ImagesGrid posts={profileUser.posts} />
-          ))}
+          )
+        ) : (
+          <ReactLoading color="#000000" height={80} width={80} />
+        )}
       </div>
     </div>
   );

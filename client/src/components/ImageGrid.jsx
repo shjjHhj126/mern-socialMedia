@@ -18,13 +18,15 @@ const style = {
 };
 
 const ImagesGrid = ({ posts }) => {
-  const [open, setOpen] = useState(false);
+  //make each image a open state
+  const [openPostIndex, setOpenPostIndex] = useState(null);
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleOpen = (index) => {
+    setOpenPostIndex(index);
   };
+
   const handleClose = () => {
-    setOpen(false);
+    setOpenPostIndex(null);
   };
 
   return (
@@ -33,7 +35,7 @@ const ImagesGrid = ({ posts }) => {
         {posts.map((post, index) => (
           <Grid item lg={4} md={3} xs={4} key={index}>
             <img
-              onClick={handleOpen}
+              onClick={() => handleOpen(index)}
               className="object-cover w-full h-full"
               src={post.images[0]}
               alt={`Image ${index}`}
@@ -44,7 +46,7 @@ const ImagesGrid = ({ posts }) => {
               }}
             />
             <Modal
-              open={open}
+              open={openPostIndex === index}
               onClose={handleClose}
               aria-labelledby="parent-modal-title"
               aria-describedby="parent-modal-description">

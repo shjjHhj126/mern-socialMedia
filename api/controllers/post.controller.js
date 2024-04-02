@@ -103,12 +103,13 @@ const updateLikes = async (req, res, next) => {
 };
 
 const getPost = async (req, res, next) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+  const post = await postModel.findById(req.params.id);
+  if (!post) {
     return next(errorHandler(401, "Post not found"));
   }
 
-  const post = await postModel.findById(req.params.id);
-  if (post.userId !== req.user.id) {
+  //or post.creator._id
+  if (post.creator !== req.user.id) {
     return next(errorHandler(401, "You can only get your own post"));
   }
   try {

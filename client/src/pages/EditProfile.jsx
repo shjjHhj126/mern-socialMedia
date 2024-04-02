@@ -9,6 +9,8 @@ import {
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/user/userSlice";
 
 export default function EditProfile({ currentUser }) {
   const [formData, setFormData] = useState({
@@ -27,6 +29,7 @@ export default function EditProfile({ currentUser }) {
   const [creating, setCreating] = useState(false);
   const avatarInput = useRef(null);
   const coverPicInput = useRef(null);
+  const dispatch = useDispatch();
   // let toastId = null;
   let coverPicDownloadURL = null;
   let avatarDownloadURL = null;
@@ -78,12 +81,13 @@ export default function EditProfile({ currentUser }) {
       );
       console.log(res.data);
       setCreating(false);
+      dispatch(setUser(formData));
 
-      toast.update(toastId, {
-        render: "Profile updated successfully!",
-        type: "success",
-        autoClose: 1000,
-      });
+      // toast.update(toastId, {
+      //   render: "Profile updated successfully!",
+      //   type: "success",
+      //   autoClose: 1000,
+      // });
     } catch (err) {
       setErrorMsg("");
       setCreating(false);

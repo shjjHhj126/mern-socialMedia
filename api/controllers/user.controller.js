@@ -12,6 +12,15 @@ const updateUser = async (req, res, next) => {
     if (!user) {
       next(errorHandler(404, "User not found"));
     }
+
+    //prevent duplicate email
+    if (req.body.email && req.body.email !== user.email) {
+      const existingUser = await userModel.findOne({ email: req.body.email });
+      if (existingUser) {
+        return next(errorHandler(400, "Email is already in use"));
+      }
+    }
+
     if (req.body.password) {
       req.body.password = bcrypt.hashSync(req.body.password, 10);
     }
