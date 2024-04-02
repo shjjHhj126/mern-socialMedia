@@ -321,14 +321,6 @@ function PostDetails({ the_post }) {
                   Edit Post
                 </MenuItem>
               )}
-              <Modal
-                open={openEditPost}
-                onClose={handleCloseEditModal}
-                style={{ zIndex: 50 }}>
-                <Box sx={style}>
-                  <EditPost post={post} />
-                </Box>
-              </Modal>
               {currentUser._id !== creator._id &&
                 (!currentUser.followings.some(
                   (fo) => fo._id === creator._id
@@ -351,6 +343,11 @@ function PostDetails({ the_post }) {
                 ))}
               <MenuItem onClick={handleMenuClose}>Cancel</MenuItem>
             </Menu>
+            <Modal open={openEditPost} onClose={handleCloseEditModal}>
+              <Box sx={style}>
+                <EditPost post={post} />
+              </Box>
+            </Modal>
           </div>
         </div>
         {/*middle */}
