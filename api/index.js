@@ -10,8 +10,7 @@ const postRoute = require("./routes/post.route");
 const commentRoute = require("./routes/comment.route");
 dotenv.config();
 
-//create a dynamic path
-const cur_dir = path.resolve();
+//create a dynamic path : __dirname
 
 // connet to database
 mongoose
@@ -30,7 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://your-frontend-render-url.onrender.com",
     credentials: true,
   })
 );
@@ -48,10 +47,10 @@ app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute);
 
 //create static path
-app.use(express.static(path.join(cur_dir, "/client/dist")));
+app.use(express.static(path.join(__dirname, "/client/dist")));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(cur_dir, "client/dist/index.html"));
+  res.sendFile(path.join(__dirname, "client/dist/index.html"));
 });
 
 //error handling middleware
