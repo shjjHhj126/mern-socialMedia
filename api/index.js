@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://your-frontend-render-url.onrender.com",
+    origin: "https://mern-socialmedia-dxas.onrender.com",
     credentials: true,
   })
 );
