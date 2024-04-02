@@ -11,6 +11,7 @@ const commentRoute = require("./routes/comment.route");
 dotenv.config();
 
 //create a dynamic path : __dirname
+const cur_dir = path.resolve();
 
 // connet to database
 mongoose
@@ -47,10 +48,10 @@ app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute);
 
 //create static path
-app.use(express.static(path.join(__dirname, "/client/dist")));
+app.use(express.static(path.join(cur_dir, "/client/dist")));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client/dist/index.html"));
+  res.sendFile(path.join(cur_dir, "client/dist/index.html"));
 });
 
 //error handling middleware
