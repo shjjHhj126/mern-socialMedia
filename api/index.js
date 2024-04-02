@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-import path from "path";
+const path = require("path");
 const userRoute = require("./routes/user.route");
 const authRoute = require("./routes/auth.route");
 const postRoute = require("./routes/post.route");
