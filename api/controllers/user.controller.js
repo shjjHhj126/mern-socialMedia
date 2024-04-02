@@ -20,7 +20,6 @@ const updateUser = async (req, res, next) => {
         return next(errorHandler(400, "Email is already in use"));
       }
     }
-
     console.log("updateUser() req.body.password", req.body.password);
 
     if (req.body.password) {
