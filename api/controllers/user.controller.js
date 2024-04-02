@@ -29,14 +29,16 @@ const updateUser = async (req, res, next) => {
       req.user.id,
       {
         $set: {
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
-          avatar: req.body.avatar,
-          city: req.body.city,
-          from: req.body.from,
-          coverPicture: req.body.coverPicture,
-          bio: req.body.bio,
+          $set: {
+            name: req.body.name || user.name,
+            email: req.body.email || user.email,
+            password: req.body.password || user.password,
+            avatar: req.body.avatar || user.avatar,
+            city: req.body.city || user.city,
+            from: req.body.from || user.from,
+            coverPicture: req.body.coverPicture || user.coverPicture,
+            bio: req.body.bio || user.bio,
+          },
         },
       },
       { new: true }
