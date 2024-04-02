@@ -250,7 +250,12 @@ export default function EditProfile({ currentUser }) {
           Password
         </label>
         <input
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            const newPassword = e.target.value;
+            if (newPassword.trim() !== "" && newPassword.trim().length >= 6) {
+              setPassword(newPassword);
+            }
+          }}
           className="flex-1 outline-none p-3 border-[2px] border-gray-100 rounded-lg"
         />
       </div>
