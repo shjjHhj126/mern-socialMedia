@@ -11,6 +11,12 @@ const signup = async (req, res, next) => {
   const user = await userModel.findOne({ email });
   if (user) return next(errorHandler(500, "Already have an account"));
   try {
+    // Check if user with the email already exists
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return next(errorHandler(500, "Email is already in use"));
+    }
+
     //encrypt password
     const hashedPassword = bcrypt.hashSync(password, 10);
     const newUser = new userModel({
