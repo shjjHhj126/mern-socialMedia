@@ -81,9 +81,11 @@ function Profile() {
   }, []);
 
   useEffect(() => {
-    setFollowState(
-      currentUser.followings.some((user) => user._id === profileId)
-    );
+    if (currentUser && currentUser.followings) {
+      setFollowState(
+        currentUser.followings.some((user) => user._id === profileId)
+      );
+    }
   }, [currentUser]);
 
   const mutationFollow = useMutation({
