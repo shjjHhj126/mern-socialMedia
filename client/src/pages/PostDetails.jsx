@@ -305,11 +305,7 @@ function PostDetails({ the_post }) {
                         handleMenuClose();
                       });
                   }}>
-                  {deletingPost ? (
-                    <ReactLoading type="spin" height={"20%"} width={"20%"} />
-                  ) : (
-                    "Delete Post"
-                  )}
+                  Delete Post
                 </MenuItem>
               )}
               {currentUser._id === creator._id && (

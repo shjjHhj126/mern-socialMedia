@@ -7,7 +7,6 @@ const test = (req, res) => {
   res.status(200).send("api route is working");
 };
 const updateUser = async (req, res, next) => {
-  console.log(req.body);
   try {
     const user = await userModel.findById(req.user.id);
     if (!user) {
@@ -43,7 +42,6 @@ const updateUser = async (req, res, next) => {
       { new: true }
     );
     await updatedUser.save();
-    console.log(updatedUser);
     res.status(200).json("user updated successfully");
   } catch (err) {
     next(err);
