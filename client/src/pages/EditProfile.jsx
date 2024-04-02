@@ -46,10 +46,6 @@ export default function EditProfile({ currentUser }) {
       setErrorMsg("Email cannot be empty.");
       setCreating(false);
       return;
-    } else if (formData.password === "") {
-      setErrorMsg("Password cannot be empty.");
-      setCreating(false);
-      return;
     }
 
     try {
@@ -72,7 +68,7 @@ export default function EditProfile({ currentUser }) {
           coverPicture: coverPicDownloadURL
             ? coverPicDownloadURL
             : formData.coverPicture,
-          password: password !== "" ? password : currentUser.password,
+          password: password !== "" ? password : null,
         },
         {
           headers: {
@@ -88,7 +84,6 @@ export default function EditProfile({ currentUser }) {
           coverPicture: coverPicDownloadURL
             ? coverPicDownloadURL
             : formData.coverPicture,
-          password: password !== "" ? password : currentUser.password,
         })
       );
 

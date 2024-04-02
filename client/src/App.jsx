@@ -13,8 +13,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-axios.defaults.baseURL = "https://mern-socialmedia-dxas.onrender.com";
-// axios.defaults.baseURL = "http://localhost:3000";
+// axios.defaults.baseURL = "https://mern-socialmedia-dxas.onrender.com";
+axios.defaults.baseURL = "http://localhost:3000";
 axios.defaults.withCredentials = true;
 
 const queryClient = new QueryClient();

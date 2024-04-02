@@ -283,7 +283,7 @@ function PostDetails({ the_post }) {
               id="basic-menu"
               anchorEl={anchorEl}
               open={openMenu}
-              onClose={handleMenuClose}
+              onClose={deletingPost ? null : handleMenuClose}
               MenuListProps={{
                 "aria-labelledby": "basic-button",
               }}>

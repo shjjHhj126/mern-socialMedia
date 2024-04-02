@@ -7,6 +7,7 @@ const test = (req, res) => {
   res.status(200).send("api route is working");
 };
 const updateUser = async (req, res, next) => {
+  console.log(req.body);
   try {
     const user = await userModel.findById(req.user.id);
     if (!user) {
@@ -20,7 +21,6 @@ const updateUser = async (req, res, next) => {
         return next(errorHandler(400, "Email is already in use"));
       }
     }
-    console.log("updateUser() req.body.password", req.body.password);
 
     if (req.body.password) {
       req.body.password = bcrypt.hashSync(req.body.password, 10);
@@ -30,21 +30,20 @@ const updateUser = async (req, res, next) => {
       req.user.id,
       {
         $set: {
-          $set: {
-            name: req.body.name || user.name,
-            email: req.body.email || user.email,
-            password: req.body.password || user.password,
-            avatar: req.body.avatar || user.avatar,
-            city: req.body.city || user.city,
-            from: req.body.from || user.from,
-            coverPicture: req.body.coverPicture || user.coverPicture,
-            bio: req.body.bio || user.bio,
-          },
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password ? req.body.password : user.password,
+          avatar: req.body.avatar,
+          city: req.body.city,
+          from: req.body.from,
+          coverPicture: req.body.coverPicture,
+          bio: req.body.bio,
         },
       },
       { new: true }
     );
     await updatedUser.save();
+    console.log(updatedUser);
     res.status(200).json("user updated successfully");
   } catch (err) {
     next(err);
