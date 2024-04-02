@@ -321,7 +321,10 @@ function PostDetails({ the_post }) {
                   Edit Post
                 </MenuItem>
               )}
-              <Modal open={openEditPost} onClose={handleCloseEditModal}>
+              <Modal
+                open={openEditPost}
+                onClose={handleCloseEditModal}
+                style={{ zIndex: 50 }}>
                 <Box sx={style}>
                   <EditPost post={post} />
                 </Box>
