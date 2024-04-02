@@ -60,19 +60,17 @@ function PostDetails({ the_post }) {
   const openMenu = Boolean(anchorEl);
   SwiperCore.use([Navigation]);
   const dispatch = useDispatch();
-  console.log("openEditPost", openEditPost);
-  console.log("openMenu", openMenu);
+  // console.log("openEditPost", openEditPost);
+  // console.log("openMenu", openMenu);
 
   useEffect(() => {
     const fetchCreator = async () => {
       const res = await axios.get(`api/user/get/${post.creator}`);
       setCreator(res.data);
-      console.log(res.data, "creator");
     };
     //cuz sometimes post.creator is an object
     if (typeof post.creator === "string") {
       fetchCreator();
-      console.log("hi");
     }
   }, []);
 
@@ -233,6 +231,7 @@ function PostDetails({ the_post }) {
   };
 
   const handleMenuClose = () => {
+    setOpenEditPost(false);
     setAnchorEl(null);
   };
 
