@@ -69,8 +69,8 @@ function Profile() {
       const getProfileUser = async () => {
         const res = await axios.get(`api/user/get/${profileId}`);
         setProfileUser(res.data);
-        console.log(res.data);
-        console.log(res.data.followings.length);
+        // console.log(res.data);
+        // console.log(res.data.followings.length);
       };
       getCurrentUser();
       getProfileUser();
@@ -81,7 +81,9 @@ function Profile() {
   }, []);
 
   useEffect(() => {
+    console.log("currentUser:", currentUser);
     if (currentUser && currentUser.followings) {
+      console.log("currentUser.followings:", currentUser.followings);
       setFollowState(
         currentUser.followings.some((user) => user._id === profileId)
       );

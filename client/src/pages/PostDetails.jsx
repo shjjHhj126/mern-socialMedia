@@ -348,6 +348,8 @@ function PostDetails({ the_post }) {
                 <EditPost post={post} />
               </Box>
             </Modal>
+            {/*must be placed outside the <Menu></Menu>, 
+            cuz of mui default setting, Menu will not close until EditPost closes, which cuz unexpected behavior */}
           </div>
         </div>
         {/*middle */}
