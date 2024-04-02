@@ -369,12 +369,15 @@ function PostDetails({ the_post }) {
                   {creator.name}&nbsp;&nbsp;
                 </span>
                 {post.caption}
+                <p>
+                  {post.tags.length > 0 &&
+                    post.tags.map((tag, index) => (
+                      <span key={index}>#{tag} </span>
+                    ))}
+                </p>
               </p>
             </div>
-            <div>
-              {post.tags.length > 0 &&
-                post.tags.map((tag, index) => <span key={index}>#{tag} </span>)}
-            </div>
+
             {post.comments &&
               post.comments.map((comment) => {
                 return (
