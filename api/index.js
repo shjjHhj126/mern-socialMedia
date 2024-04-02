@@ -8,7 +8,7 @@ const userRoute = require("./routes/user.route");
 const authRoute = require("./routes/auth.route");
 const postRoute = require("./routes/post.route");
 const commentRoute = require("./routes/comment.route");
-dotenv.config();
+dotenv.config({ path: "config.env" });
 
 //create a dynamic path : __dirname
 const cur_dir = path.resolve();
