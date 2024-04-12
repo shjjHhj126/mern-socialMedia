@@ -263,17 +263,9 @@ function PostCard({ the_post }) {
           ) : (
             <FaRegHeart className="hover:text-gray-500 " onClick={handleLike} />
           )}
-          <FaRegComment onClick={() => setOpenModal(true)} />
+          <FaRegComment onClick={handleOpen} />
         </div>
-        <Modal
-          open={openModal}
-          onClose={handleCloseModal}
-          aria-labelledby="parent-modal-title"
-          aria-describedby="parent-modal-description">
-          <Box sx={style}>
-            <PostDetails the_post={post} />
-          </Box>
-        </Modal>
+
         {bookmarkState ? (
           <FaBookmark onClick={handleBookmark} className="text-2xl" />
         ) : (
