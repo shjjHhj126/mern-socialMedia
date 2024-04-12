@@ -53,6 +53,7 @@ function PostCard({ the_post }) {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [open, setOpen] = useState(false);
   // const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -217,6 +218,9 @@ function PostCard({ the_post }) {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   return (
     <div className="flex flex-col w-full border-b border-gray-400">
@@ -259,8 +263,17 @@ function PostCard({ the_post }) {
           ) : (
             <FaRegHeart className="hover:text-gray-500 " onClick={handleLike} />
           )}
-          <FaRegComment />
+          <FaRegComment onClick={() => setOpenModal(true)} />
         </div>
+        <Modal
+          open={openModal}
+          onClose={handleCloseModal}
+          aria-labelledby="parent-modal-title"
+          aria-describedby="parent-modal-description">
+          <Box sx={style}>
+            <PostDetails the_post={post} />
+          </Box>
+        </Modal>
         {bookmarkState ? (
           <FaBookmark onClick={handleBookmark} className="text-2xl" />
         ) : (
