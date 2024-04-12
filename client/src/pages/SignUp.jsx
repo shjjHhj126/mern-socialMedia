@@ -53,7 +53,7 @@ export default function SignUp() {
           <span
             style={{ fontFamily: "Cursive" }}
             className=" text-black text-6xl w-full flex gap-2 items-center mb-6">
-            Instotgram
+            Instogram
           </span>
           <span className="font-semibold text-lg">
             Connect with friends and the world around you on instogram

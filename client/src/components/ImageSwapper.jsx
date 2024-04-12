@@ -20,7 +20,6 @@ export default function ImageSwapper({ images }) {
             }}></div>
         </SwiperSlide>
       ))}
-      <p>hkkk</p>
     </Swiper>
   );
 }
