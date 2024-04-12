@@ -384,7 +384,7 @@ function PostDetails({ the_post }) {
                   <div
                     key={comment._id}
                     className="flex flex-row p-2 gap-3 w-full ">
-                    <Link to={`/profile/${comment.author.toString()}`}>
+                    <Link to={`/profile/${comment.author.id}`}>
                       <img
                         src={comment.authorAvatar}
                         className="h-8 w-8 rounded-full"
